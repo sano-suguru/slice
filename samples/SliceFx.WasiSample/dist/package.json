@@ -16,6 +16,6 @@
   "devDependencies": {
     "@bytecodealliance/jco": "1.25.2",
     "binaryen": "131.0.0",
-    "wrangler": "4.100.0"
+    "wrangler": "4.114.0"
   }
 }
