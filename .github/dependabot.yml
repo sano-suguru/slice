@@ -4,20 +4,20 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # These three set the minimum Roslyn version that SliceFx.SourceGenerator
-    # and SliceFx.SourceGenerator.CodeFixes require of a consumer's compiler and
-    # IDE. Keep them low; ignore minor/patch bumps. Raise the floor manually only
-    # when intentionally dropping support for older SDKs (major bumps still
-    # surface, so the decision reaches a human once per major).
+    # These two set the minimum Roslyn version consumers must provide.
+    # Microsoft.CodeAnalysis.CSharp is what SliceFx.SourceGenerator compiles against,
+    # so it bounds their compiler. Workspaces is what the code fix project compiles
+    # against; it ships inside the generator package and the assembly comes from the
+    # IDE host, so it bounds their IDE. Keep both low; ignore minor/patch. Raise the
+    # floor manually only when intentionally dropping support for older SDKs --
+    # majors still surface, so the decision reaches a human once per Roslyn major.
     #
-    # Only CodeAnalysis.CSharp was listed here originally, which left Workspaces
-    # and Analyzers free to raise the same floor through routine minor bumps.
+    # Microsoft.CodeAnalysis.Analyzers is deliberately NOT here: it is analyzer-author
+    # RS**** rules, build-time only, and sets no consumer floor.
     ignore:
       - dependency-name: "Microsoft.CodeAnalysis.CSharp"
         update-types: ["version-update:semver-minor", "version-update:semver-patch"]
       - dependency-name: "Microsoft.CodeAnalysis.CSharp.Workspaces"
-        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
-      - dependency-name: "Microsoft.CodeAnalysis.Analyzers"
         update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: github-actions
