@@ -160,8 +160,8 @@ two blocks under `#positioning`. No sentence is dropped; the heading hierarchy l
 |---|---|---|
 | `C# 12` badge | `net10.0` + `LangVersion=latest` is **C# 14** | `C# feature` — version-independent, as today |
 | `NET 10.0 Native AOT Ready` | CLAUDE.md says Native AOT *minded* | `Native AOT-minded` |
-| `One file. One feature. Zero drift.` | "Zero drift" is not a claim the project can support | **`One file. One feature. Generated contracts.`** — already the alt text of `ogp.svg`, so the OGP image and the headline finally agree |
-| `Zero API Drift` (feature 02) | same | `Generated contracts` |
+| `One file. One feature. Zero drift.` | "Zero drift" is not a claim the project can support | **`One file. One feature. Generated API contracts.`** — the current headline verbatim, which is also the alt text of `ogp.svg` |
+| `Zero API Drift` (feature 02) | same | `API contracts stay aligned` (current wording) |
 | `dotnet add package SliceFx.Core` | ① `0.1.0-preview.17` is prerelease, so this **does not resolve without `--prerelease`** ② Core alone does nothing — `SliceFx.SourceGenerator` is required | two lines: `dotnet add package SliceFx.Core --prerelease` / `dotnet add package SliceFx.SourceGenerator --prerelease` |
 | `Built for ASP.NET. Ready for the Edge.` | WASI depends on componentize-dotnet, NativeAOT-LLVM and jco — upstream preview tooling that CLAUDE.md forbids presenting as a SliceFx guarantee | `Start with ASP.NET Core. WASI is optional.` (current wording) |
 | `Class: Portable` — "Returns plain record/void" | Actually `SliceResult<T>`, `SliceResult`, POCO, `Task<T>`, `ValueTask<T>` | current wording |
@@ -208,23 +208,26 @@ its verbosity.
 **Preserved in full:** canonical link, `rel=sitemap`, `<meta name="robots" content="index,
 follow">`, three `hreflang` alternates, nine Open Graph properties, four Twitter Card
 properties, the `SoftwareApplication` JSON-LD block, the skip link, `aria-label="Primary
-navigation"`, `tabindex="-1"` on `#main-content`, and `html { scroll-padding-top: 5rem }` —
-without which every anchor target lands underneath the 64px sticky nav. The draft carries
-`scroll-smooth` but drops the padding.
+navigation"`, `tabindex="-1"` on `#main-content`, and `aria-live="polite"` on `#copyStatus`.
+
+Also preserved, and all three absent from the draft:
+
+- `html { scroll-padding-top: 5rem }` with `[id] { scroll-margin-top: 5rem }`, raised to `8rem`
+  under `max-width: 767px`. Without it every anchor target lands underneath the sticky nav.
+- A visible `:focus-visible` ring — currently `2px solid #60a5fa`, restyled to the accent.
+- The `prefers-reduced-motion` block, including `scroll-behavior: auto`. Its member list is
+  rewritten for the new class names, and gains the draft's hover translate.
 
 **Added:**
-- A visible `:focus-visible` ring (absent from the draft) — a 2px accent outline, matching the
-  hard-edged visual language.
-- `prefers-reduced-motion` suppression of both the draft's hover translate **and**
-  `scroll-behavior: smooth`.
 - `tabindex="0"` on `<pre>` blocks. The draft's `no-scrollbar` rule hides the scrollbar on
   horizontally scrolling code, which leaves keyboard users unable to read past the fold without
   it.
-- `aria-live="polite"` on `#copyStatus`. The copy button's result is announced to no one today
-  — a defect the current site shares.
 - `rel="noopener noreferrer"` on both `target="_blank"` links.
 - The copy button bound via `addEventListener` in `site.js` rather than an inline `onclick`,
   which keeps a future Content-Security-Policy possible.
+
+The draft drops all six of the preserved items above. Each is a regression to guard against
+during transcription, not a feature to design.
 
 ## Verification
 
