@@ -1039,6 +1039,84 @@ code[data-kind="command"]::before {
     }
 }
 
+/* ---------- Footer ------------------------------------------------------ */
+/* --fg-mute on --surface is 6.91:1. zinc-500 would be 3.67:1 and fail. */
+
+.site-footer {
+    margin-top: auto;
+    background: var(--surface);
+    border-top: 2px solid var(--line);
+}
+
+.foot {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: 3rem 1.5rem;
+}
+
+.foot__mark-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.foot__mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+    background: var(--line);
+    color: var(--fg);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.foot__desc {
+    max-width: 20rem;
+    color: var(--fg-mute);
+    font-size: 0.8rem;
+}
+
+.foot__cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+}
+
+.foot__col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.foot__head {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg);
+}
+
+.foot__col a {
+    color: var(--fg-mute);
+    text-decoration: none;
+}
+
+.foot__col a:hover {
+    color: var(--accent-text);
+}
+
+@media (min-width: 768px) {
+    .foot {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 3rem;
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {
