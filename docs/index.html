@@ -311,6 +311,60 @@ slicefx client typescript --output slice-api-client.ts</pre>
             </div>
         </section>
 
+        <!-- ===== What you get ============================================ -->
+        <section class="band">
+            <div class="wrap sect">
+                <h2 class="h-lg sect__title"><span class="lang-ja">SliceFx の強み</span><span class="lang-en">What you get</span></h2>
+
+                <div class="two-col">
+                    <div class="strengths">
+                        <article class="strength">
+                            <h3 class="strength__title"><span class="lang-ja">Core は NuGet 依存ゼロ</span><span class="lang-en">Zero-dependency core</span></h3>
+                            <p><span class="lang-ja">コアランタイムが依存するのは <code>Microsoft.AspNetCore.App</code> だけです。FluentValidation や MediatR を前提にせず、必要なアダプタだけを後から追加できます。</span><span class="lang-en">The core runtime only depends on <code>Microsoft.AspNetCore.App</code>. FluentValidation and MediatR are not required; optional adapters can be added later.</span></p>
+                        </article>
+                        <article class="strength">
+                            <h3 class="strength__title"><span class="lang-ja">生成された登録コード</span><span class="lang-en">Generated registrations</span></h3>
+                            <p><span class="lang-ja"><code>AddSlice()</code> と <code>MapSlices()</code> はソースジェネレータが出力します。登録経路を1つに絞り、無効な機能定義は <code>SLICE###</code> 診断としてビルド時に出します。</span><span class="lang-en"><code>AddSlice()</code> and <code>MapSlices()</code> are emitted by the source generator. Invalid feature shapes become <code>SLICE###</code> diagnostics at build time.</span></p>
+                        </article>
+                        <article class="strength">
+                            <h3 class="strength__title"><span class="lang-ja">Native AOT を意識した起動経路</span><span class="lang-en">Native AOT-minded startup path</span></h3>
+                            <p><span class="lang-ja">生成コードは標準の <code>MapMethods</code> 呼び出しに展開され、起動時のルートスキャンを避けます。<code>SliceFx.Core</code> は NuGet 依存を増やさず、trimming/AOT 向けの小さな土台を保ちます。</span><span class="lang-en">Generated code expands to standard <code>MapMethods</code> calls and avoids startup route scanning. <code>SliceFx.Core</code> avoids extra NuGet dependencies to keep the base small for trimming and Native AOT.</span></p>
+                        </article>
+                        <article class="strength">
+                            <h3 class="strength__title"><span class="lang-ja">必要なアダプタだけ追加</span><span class="lang-en">Optional adapters</span></h3>
+                            <p><span class="lang-ja">AWS Lambda、wasi:http、TestHost へのアダプタはサテライトパッケージです。普段は ASP.NET Core で使いながら、移植できる機能を <code data-kind="command">slicefx routes</code> で確認できます。</span><span class="lang-en">Lambda, wasi:http, and TestHost support live in satellite packages. Use ASP.NET Core day to day while <code data-kind="command">slicefx routes</code> shows which features remain portable.</span></p>
+                        </article>
+                        <article class="strength">
+                            <h3 class="strength__title"><span class="lang-ja">ルートマニフェスト</span><span class="lang-en">Route-manifest tooling</span></h3>
+                            <p><span class="lang-ja">ルートマニフェストをもとに、<code data-kind="command">slicefx routes</code>、<code data-kind="command">slicefx client csharp</code>、<code data-kind="command">slicefx client typescript</code>、<code data-kind="command">slicefx openapi</code> が同じ定義を使います。</span><span class="lang-en">The route manifest powers <code data-kind="command">slicefx routes</code>, <code data-kind="command">slicefx client csharp</code>, <code data-kind="command">slicefx client typescript</code>, and <code data-kind="command">slicefx openapi</code> from the same definitions.</span></p>
+                        </article>
+                        <article class="strength">
+                            <h3 class="strength__title"><span class="lang-ja">ロックインが小さい</span><span class="lang-en">Low lock-in</span></h3>
+                            <p><span class="lang-ja">ジェネレータが出力するのは標準の <code>MapMethods</code> 呼び出しです。ジェネレータ参照を外して生成コードをその場で展開すれば、フレームワーク残留物の少ない離脱経路になります。</span><span class="lang-en">The generator emits standard <code>MapMethods</code> calls. Remove the source generator reference and expand the generated output in place for a low-residue exit path.</span></p>
+                        </article>
+                        <article class="strength">
+                            <h3 class="strength__title"><span class="lang-ja">ASP.NET の機能はそのまま</span><span class="lang-en">Full ASP.NET surface</span></h3>
+                            <p><span class="lang-ja">生成コードは純粋な Minimal API 展開です。<code>[Authorize]</code>、認証・認可ポリシー、出力キャッシュ、レート制限、CORS、OpenAPI、標準バインディングはすべて使い続けられます。<a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET 機能とエスケープハッチ →</a></span><span class="lang-en">Generated code is pure Minimal API expansion. <code>[Authorize]</code>, auth policies, output caching, rate limiting, CORS, OpenAPI, and standard binding all stay available. <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET features and escape hatches →</a></span></p>
+                        </article>
+                    </div>
+
+                    <div class="panel today">
+                        <h3 class="h-md today__title"><span class="lang-ja">いま使える機能</span><span class="lang-en">What works today</span></h3>
+                        <ul class="today__list">
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja"><code>[Feature("METHOD /path")]</code> でルートを宣言</span><span class="lang-en"><code>[Feature("METHOD /path")]</code> declarative routing</span></span></li>
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja">ソースジェネレータで登録コードを生成</span><span class="lang-en">Source-generated registrations</span></span></li>
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja">Minimal API バインディングに対応した静的ハンドラー</span><span class="lang-en">Static handlers with Minimal API binding</span></span></li>
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja"><code>[Filter&lt;T&gt;]</code> でエンドポイントフィルターを適用</span><span class="lang-en"><code>[Filter&lt;T&gt;]</code> endpoint filters</span></span></li>
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja">DataAnnotations と <code>ISliceValidator&lt;T&gt;</code> で検証</span><span class="lang-en">DataAnnotations and <code>ISliceValidator&lt;T&gt;</code></span></span></li>
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja">名前空間から OpenAPI タグを推論</span><span class="lang-en">OpenAPI tags inferred from namespaces</span></span></li>
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja">ルートメタデータの出力と移植性レポート</span><span class="lang-en">Route metadata export and portability reporting</span></span></li>
+                            <li><svg class="i i--check" aria-hidden="true"><use href="#i-check"></use></svg><span><span class="lang-ja">C# / TypeScript 型付きクライアント生成</span><span class="lang-en">C# / TypeScript typed client generation</span></span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">
