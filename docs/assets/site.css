@@ -276,6 +276,22 @@ code[data-kind="command"]::before {
     font-weight: 700;
 }
 
+/* ---------- Copy status ------------------------------------------------ */
+
+.copy-status {
+    min-height: 1.25rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+}
+
+.copy-status.is-ok {
+    color: var(--success);
+}
+
+.copy-status.is-error {
+    color: #fca5a5;
+}
+
 /* ---------- Accessibility ---------------------------------------------- */
 
 .skip-link {
