@@ -1,0 +1,1213 @@
+/* SliceFx site styles. Hand-written; no build step, no utility framework.
+   Served verbatim by .github/workflows/pages.yml. */
+
+/* ---------- Tokens ----------------------------------------------------- */
+/* The accent is split by role. One violet cannot clear WCAG AA in all three
+   positions: white on #8b5cf6 is 4.23:1 and #8b5cf6 on --surface is 4.18:1. */
+
+:root {
+    --base: #09090b;
+    --surface: #18181b;
+    --line: #27272a;
+    --success: #10b981;
+    --fg: #f4f4f5;
+    --fg-mute: #a1a1aa;
+    --fg-dim: #8b8b94;
+    --accent: #8b5cf6;      /* text on --base            4.70:1 */
+    --accent-text: #a78bfa; /* text on --surface         6.51:1 */
+    --accent-bg: #7c3aed;   /* background under white    5.70:1 */
+    --shadow-hard: 4px 4px 0 0 var(--accent);
+    --nav-h: 4rem;
+}
+
+/* ---------- Reset ------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+p,
+figure,
+blockquote,
+dl,
+dd {
+    margin: 0;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+img,
+svg {
+    max-width: 100%;
+}
+
+/* ---------- Base ------------------------------------------------------- */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--base);
+    color: var(--fg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body[data-lang="en"] {
+    font-family: "Inter", system-ui, sans-serif;
+    letter-spacing: -0.01em;
+}
+
+body[data-lang="ja"] {
+    font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+    letter-spacing: 0.01em;
+}
+
+code,
+pre,
+.mono {
+    font-family: "JetBrains Mono", "Noto Sans JP", monospace;
+    letter-spacing: 0;
+}
+
+a {
+    color: inherit;
+}
+
+::selection {
+    background: var(--accent-bg);
+    color: #fff;
+}
+
+/* ---------- Language toggle -------------------------------------------- */
+
+body[data-lang="ja"] .lang-en {
+    display: none !important;
+}
+
+body[data-lang="en"] .lang-ja {
+    display: none !important;
+}
+
+/* ---------- Layout ----------------------------------------------------- */
+
+.wrap {
+    max-width: 80rem;
+    margin-inline: auto;
+    border-inline: 2px solid var(--line);
+}
+
+.band {
+    border-bottom: 2px solid var(--line);
+}
+
+.blueprint {
+    background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center top;
+}
+
+/* ---------- Type ------------------------------------------------------- */
+
+.label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+.h-xl {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.h-lg {
+    font-size: clamp(1.75rem, 3.5vw, 2rem);
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.h-md {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+/* ---------- Surfaces --------------------------------------------------- */
+
+.panel {
+    border: 2px solid var(--line);
+    background: var(--surface);
+    border-radius: 0;
+}
+
+.panel--hard {
+    box-shadow: var(--shadow-hard);
+}
+
+/* ---------- Controls --------------------------------------------------- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    border: 2px solid;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn--primary {
+    background: var(--accent-bg);
+    border-color: var(--accent-bg);
+    color: #fff;
+    box-shadow: var(--shadow-hard);
+}
+
+.btn--primary:hover {
+    box-shadow: 2px 2px 0 0 var(--accent);
+    transform: translate(2px, 2px);
+}
+
+.btn--ghost {
+    background: var(--surface);
+    border-color: var(--line);
+    color: var(--fg);
+}
+
+.btn--ghost:hover {
+    border-color: var(--accent);
+}
+
+/* ---------- Inline code ------------------------------------------------ */
+
+:not(pre) > code {
+    border: 1px solid var(--line);
+    background: var(--base);
+    color: var(--accent-text);
+    padding: 0.1rem 0.4rem;
+    font-size: 0.92em;
+}
+
+code[data-kind="command"] {
+    color: var(--success);
+}
+
+code[data-kind="command"]::before {
+    content: "$";
+    margin-right: 0.35rem;
+}
+
+/* ---------- Code blocks ------------------------------------------------ */
+
+.code {
+    border: 2px solid var(--line);
+    background: var(--surface);
+}
+
+.code__bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--line);
+    background: var(--base);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+    color: var(--fg-mute);
+}
+
+/* The filename is one unbreakable token; without min-width:0 it refuses to
+   shrink and pushes the chip past the viewport at narrow widths. */
+.code__bar > :first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.code__chip {
+    flex: none;
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    white-space: nowrap;
+}
+
+.code pre {
+    overflow-x: auto;
+    padding: 1.5rem;
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.token.keyword {
+    color: var(--accent-text);
+    font-weight: 700;
+}
+
+.token.string {
+    color: var(--success);
+}
+
+.token.function {
+    color: #38bdf8;
+}
+
+.token.comment {
+    color: var(--fg-dim);
+    font-style: italic;
+}
+
+.token.type {
+    color: var(--fg);
+    font-weight: 700;
+}
+
+/* ---------- Icons ------------------------------------------------------ */
+/* Two inline SVGs only: the GitHub mark and a check glyph. No icon library. */
+
+.i {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+}
+
+.i--check {
+    color: var(--success);
+}
+
+/* ---------- Nav -------------------------------------------------------- */
+
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--base);
+    border-bottom: 2px solid var(--line);
+}
+
+.nav__inner {
+    border-bottom: 0;
+}
+
+.nav__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: var(--nav-h);
+    padding-inline: 1.5rem;
+}
+
+.nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    min-width: 0;
+}
+
+.nav__mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex: none;
+    background: var(--accent-bg);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.nav__word {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.nav__chip {
+    flex: none;
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    color: var(--fg-mute);
+}
+
+.nav__links,
+.nav__end {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav__links a,
+.nav__mobile a,
+.nav__gh {
+    text-decoration: none;
+    color: var(--fg-mute);
+}
+
+.nav__links a:hover,
+.nav__mobile a:hover,
+.nav__gh:hover {
+    color: var(--accent-text);
+}
+
+.nav__end {
+    gap: 1rem;
+}
+
+.nav__gh {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lang-select {
+    border: 2px solid var(--line);
+    background: var(--surface);
+    color: var(--fg);
+    padding: 0.35rem 0.5rem;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.nav__mobile {
+    display: none;
+    gap: 1rem;
+    padding: 0 1.5rem 0.75rem;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* The brand + chip + five links + select + GitHub do not fit at 768px --
+   they collide. The desktop row only earns its place from 1024px up. */
+@media (max-width: 1023px) {
+    .nav {
+        --nav-h: 3.5rem;
+    }
+
+    .nav__links {
+        display: none;
+    }
+
+    .nav__mobile {
+        display: flex;
+    }
+
+    .nav__chip {
+        display: none;
+    }
+}
+
+@media (max-width: 479px) {
+    .nav__gh-text {
+        display: none;
+    }
+}
+
+/* ---------- Hero ------------------------------------------------------- */
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    background: var(--base);
+}
+
+.hero__copy {
+    padding: 3rem 1.5rem;
+}
+
+.hero__title {
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.hero__accent {
+    color: var(--accent);
+}
+
+.hero__lede {
+    max-width: 32rem;
+    margin-bottom: 2rem;
+    color: var(--fg-mute);
+    font-family: "JetBrains Mono", "Noto Sans JP", monospace;
+    font-size: 0.95rem;
+}
+
+.hero__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.hero__code {
+    border-top: 2px solid var(--line);
+    background: var(--surface);
+}
+
+.code--flush {
+    border: 0;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    padding: 0.4rem 0.75rem;
+    color: var(--accent-text);
+}
+
+.chip__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    flex: none;
+    background: var(--success);
+}
+
+.copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    padding: 0.85rem 1rem;
+    min-width: 0;
+}
+
+.copy > code {
+    border: 0;
+    background: none;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+.copy__btn {
+    display: inline-flex;
+    flex: none;
+    border: 0;
+    background: none;
+    color: var(--fg-mute);
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.copy__btn:hover {
+    color: var(--fg);
+}
+
+.pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.pill {
+    border: 2px solid var(--line);
+    padding: 0.4rem 0.75rem;
+    color: var(--fg-mute);
+}
+
+@media (min-width: 1024px) {
+    .hero {
+        flex-direction: row;
+    }
+
+    .hero__copy {
+        width: 50%;
+        padding: 5rem 4rem;
+        border-right: 2px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .hero__code {
+        width: 50%;
+        border-top: 0;
+    }
+
+    .hero__actions {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+/* ---------- Release status --------------------------------------------- */
+
+.release {
+    background: var(--base);
+    padding: 2rem 1.5rem;
+}
+
+.release__panel {
+    border: 2px solid var(--success);
+    background: var(--surface);
+    padding: 1.25rem;
+    font-size: 0.9rem;
+}
+
+.release__head {
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: 0.5rem;
+}
+
+.release__body {
+    color: var(--fg-mute);
+}
+
+.release__body a {
+    color: var(--accent-text);
+}
+
+/* ---------- Ticker ----------------------------------------------------- */
+/* --accent-bg, never --accent: white on #8b5cf6 is 4.23:1 and fails AA. */
+
+.ticker {
+    background: var(--accent-bg);
+    color: #fff;
+}
+
+.ticker__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+    padding: 1rem 1.5rem;
+    border-inline: 0;
+    text-align: center;
+}
+
+.ticker__sep {
+    opacity: 0.55;
+}
+
+@media (min-width: 640px) {
+    .ticker__inner {
+        justify-content: space-between;
+    }
+}
+
+/* ---------- Split layout (sticky aside + staggered main) --------------- */
+
+.split {
+    display: flex;
+    flex-direction: column;
+    background: var(--base);
+}
+
+.split__aside {
+    background: var(--surface);
+    border-bottom: 2px solid var(--line);
+}
+
+.split__sticky {
+    padding: 3rem 1.5rem;
+}
+
+.split__title {
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.split__lede {
+    margin-bottom: 2rem;
+    color: var(--fg-mute);
+    font-family: "JetBrains Mono", "Noto Sans JP", monospace;
+    font-size: 0.875rem;
+}
+
+.facts__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-mute);
+}
+
+.facts__row dd {
+    margin: 0;
+    text-align: right;
+}
+
+.stagger {
+    padding: 3rem 1.5rem;
+    border-bottom: 2px solid var(--line);
+}
+
+.stagger:last-child {
+    border-bottom: 0;
+}
+
+.stagger__num {
+    margin-bottom: 1rem;
+    color: var(--accent);
+}
+
+.stagger__title {
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.stagger__body {
+    max-width: 36rem;
+    margin-bottom: 1.5rem;
+    color: var(--fg-mute);
+    font-size: 0.95rem;
+}
+
+.stagger__note {
+    color: var(--fg-mute);
+    font-size: 0.875rem;
+}
+
+.stagger__note a {
+    color: var(--accent);
+}
+
+@media (min-width: 768px) {
+    .split {
+        flex-direction: row;
+    }
+
+    .split__aside {
+        width: 33.333%;
+        flex: none;
+        border-bottom: 0;
+        border-right: 2px solid var(--line);
+    }
+
+    .split__sticky {
+        position: sticky;
+        top: var(--nav-h);
+        padding: 3rem;
+    }
+
+    .split__main {
+        width: 66.667%;
+    }
+
+    .stagger {
+        padding: 3rem;
+    }
+}
+
+/* ---------- Generic section -------------------------------------------- */
+
+.sect {
+    background: var(--base);
+    padding: 3rem 1.5rem;
+}
+
+.sect__eyebrow {
+    margin-bottom: 0.75rem;
+    color: var(--accent);
+}
+
+.sect__title {
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.sect__title--second {
+    margin-top: 4rem;
+}
+
+.sect__lede {
+    max-width: 44rem;
+    margin-bottom: 2rem;
+    color: var(--fg-mute);
+    font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+    .sect {
+        padding: 5rem 3rem;
+    }
+}
+
+/* ---------- Key/value rows --------------------------------------------- */
+
+.rows {
+    border: 2px solid var(--line);
+    background: var(--surface);
+}
+
+.rows__row {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid var(--line);
+}
+
+.rows__row:last-child {
+    border-bottom: 0;
+}
+
+.rows__key {
+    padding: 1.25rem;
+    font-weight: 700;
+    background: var(--base);
+}
+
+.rows__key--self {
+    color: var(--accent-text);
+}
+
+.rows__val {
+    padding: 1.25rem;
+    color: var(--fg-mute);
+    font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+    .rows__row {
+        flex-direction: row;
+    }
+
+    .rows__key {
+        width: 14rem;
+        flex: none;
+        border-right: 2px solid var(--line);
+    }
+}
+
+/* ---------- Strengths / what works today ------------------------------- */
+
+.two-col {
+    display: grid;
+    gap: 2rem;
+}
+
+.strengths {
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+}
+
+.strength {
+    border-left: 2px solid var(--line);
+    padding-left: 1.25rem;
+}
+
+.strength__title {
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.strength p {
+    color: var(--fg-mute);
+    font-size: 0.95rem;
+}
+
+.strength a {
+    color: var(--accent);
+}
+
+.today {
+    padding: 2rem;
+    align-self: start;
+}
+
+.today__title {
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--line);
+    text-transform: uppercase;
+}
+
+.today__list {
+    display: grid;
+    gap: 1rem;
+}
+
+.today__list li {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.today__list .i {
+    margin-top: 0.2rem;
+}
+
+@media (min-width: 1024px) {
+    .two-col {
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 3rem;
+    }
+
+    .today {
+        position: sticky;
+        top: calc(var(--nav-h) + 2rem);
+    }
+}
+
+/* ---------- Stacked code windows / notes -------------------------------- */
+
+.code--stack {
+    margin-bottom: 2rem;
+}
+
+.note {
+    border: 2px solid var(--accent);
+    background: var(--surface);
+    padding: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--fg-mute);
+}
+
+.note__head {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: var(--accent-text);
+}
+
+.note a {
+    color: var(--accent-text);
+}
+
+/* ---------- Cards ------------------------------------------------------ */
+
+.sect__lede--dim {
+    color: var(--fg-dim);
+    font-size: 0.875rem;
+}
+
+.cards {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.card {
+    padding: 1.5rem;
+}
+
+.card p {
+    color: var(--fg-mute);
+    font-size: 0.9rem;
+}
+
+.card__name {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.card--portable .card__name {
+    color: var(--success);
+}
+
+.card--partial .card__name {
+    color: #eab308;
+}
+
+.card--aspnet .card__name {
+    color: var(--accent-text);
+}
+
+.card--portable:hover {
+    border-color: var(--success);
+}
+
+.card--partial:hover {
+    border-color: #eab308;
+}
+
+.card--aspnet:hover {
+    border-color: var(--accent);
+}
+
+@media (min-width: 768px) {
+    .cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ---------- Packages --------------------------------------------------- */
+
+.pkgs {
+    display: grid;
+    gap: 1rem;
+}
+
+.pkg {
+    display: block;
+    padding: 1.5rem;
+    text-decoration: none;
+}
+
+.pkg:hover {
+    border-color: var(--accent);
+}
+
+.pkg__name {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.pkg p {
+    color: var(--fg-mute);
+    font-size: 0.9rem;
+}
+
+@media (min-width: 640px) {
+    .pkgs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ---------- Docs grid --------------------------------------------------- */
+
+.docs {
+    display: grid;
+    gap: 1rem;
+}
+
+.doc {
+    display: block;
+    padding: 1.5rem;
+    text-decoration: none;
+}
+
+.doc:not(.doc--static):hover {
+    border-color: var(--accent);
+}
+
+.doc__num {
+    margin-bottom: 0.75rem;
+    color: var(--accent);
+}
+
+.doc__title {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.doc__body {
+    color: var(--fg-mute);
+    font-size: 0.875rem;
+}
+
+.doc__cta {
+    margin-top: 1rem;
+    color: var(--accent-text);
+}
+
+.doclinks {
+    margin-top: 2rem;
+    color: var(--fg-mute);
+    font-size: 0.875rem;
+    line-height: 2;
+}
+
+.doclinks a {
+    color: var(--accent-text);
+}
+
+@media (min-width: 640px) {
+    .docs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .docs {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ---------- Footer ------------------------------------------------------ */
+/* --fg-mute on --surface is 6.91:1. zinc-500 would be 3.67:1 and fail. */
+
+.site-footer {
+    margin-top: auto;
+    background: var(--surface);
+    border-top: 2px solid var(--line);
+}
+
+.foot {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: 3rem 1.5rem;
+}
+
+.foot__mark-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.foot__mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+    background: var(--line);
+    color: var(--fg);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.foot__desc {
+    max-width: 20rem;
+    color: var(--fg-mute);
+    font-size: 0.8rem;
+}
+
+.foot__cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+}
+
+.foot__col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.foot__head {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg);
+}
+
+.foot__col a {
+    color: var(--fg-mute);
+    text-decoration: none;
+}
+
+.foot__col a:hover {
+    color: var(--accent-text);
+}
+
+@media (min-width: 768px) {
+    .foot {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 3rem;
+    }
+}
+
+/* ---------- Copy status ------------------------------------------------ */
+
+.copy-status {
+    min-height: 1.25rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.75rem;
+}
+
+.copy-status.is-ok {
+    color: var(--success);
+}
+
+.copy-status.is-error {
+    color: #fca5a5;
+}
+
+/* ---------- Accessibility ---------------------------------------------- */
+
+.skip-link {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+    transform: translateY(-150%);
+    transition: transform 0.2s ease;
+    padding: 0.5rem 1rem;
+    background: var(--fg);
+    color: var(--base);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+:where(a, button, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 3px;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--nav-h);
+}
+
+[id] {
+    scroll-margin-top: var(--nav-h);
+}
+
+/* Same breakpoint as the nav above: below 1024px the nav is two rows tall. */
+@media (max-width: 1023px) {
+    html {
+        scroll-padding-top: 8rem;
+    }
+
+    [id] {
+        scroll-margin-top: 8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .btn--primary:hover {
+        transform: none !important;
+    }
+}

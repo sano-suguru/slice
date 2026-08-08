@@ -20,7 +20,8 @@ git config core.hooksPath .githooks
 
 ```bash
 dotnet build
-dotnet test SliceFx.slnx --configuration Release --no-build --no-restore
+dotnet test SliceFx.slnx --configuration Release --no-build --no-restore --filter "Category!=RequiresPublish"  # local default; see note below
+dotnet test SliceFx.slnx --configuration Release --no-build --no-restore  # everything, incl. the 10min+ trim-publish test (what CI runs)
 dotnet run --project samples/SliceFx.Sample        # listens on http://localhost:5099
 dotnet run --project samples/SliceFx.LambdaSample  # listens on http://localhost:5100 (Lambda-ready)
 dotnet run --project samples/SliceFx.LambdaFunctionPerFeatureSample  # http://localhost:5000 (default); demo for function-per-feature NativeAOT packaging
@@ -33,7 +34,11 @@ dotnet publish samples/SliceFx.AotSample -c Release    # macOS: osx-arm64 native
 dotnet format SliceFx.slnx --verify-no-changes --severity info --exclude-diagnostics CS1591 xUnit1004  # matches CI; drop --verify-no-changes to apply
 ```
 
-xUnit tests live under `tests/` — runtime tests (`SliceFx.Core.Tests`, `SliceFx.SourceGenerator.Tests`, `SliceFx.TestHost.Tests`, `SliceFx.AotSample.Tests`, `SliceFx.Wasi.Tests`, `SliceFx.Wasi.KeyValue.Tests`, `SliceFx.Wasi.HttpClient.Tests`, `SliceFx.Wasi.Spin.Tests`, `SliceFx.Wasi.IntegrationTests`, `SliceFx.Lambda.Tests`, `SliceFx.Lambda.FunctionPerFeature.Tests`, `SliceFx.Cli.Tests`), the `SliceFx.Lambda.NativeAotFixture` support project, and benchmarks (`SliceFx.Benchmarks`, `SliceFx.Benchmarks.Runtime`, plus the `SliceFx.Benchmarks.RuntimeApps/Bench{50,100,200}` size-graded scenario apps). CI runs `dotnet test SliceFx.slnx` (whole solution); use `dotnet test tests/<Name>` to target one project, or `dotnet test SliceFx.slnx --filter "FullyQualifiedName~<Substring>"` for a single test. Also smoke-test the main sample when behavior changes (app must be running):
+xUnit tests live under `tests/` — runtime tests (`SliceFx.Core.Tests`, `SliceFx.SourceGenerator.Tests`, `SliceFx.TestHost.Tests`, `SliceFx.AotSample.Tests`, `SliceFx.Wasi.Tests`, `SliceFx.Wasi.KeyValue.Tests`, `SliceFx.Wasi.HttpClient.Tests`, `SliceFx.Wasi.Spin.Tests`, `SliceFx.Wasi.IntegrationTests`, `SliceFx.Lambda.Tests`, `SliceFx.Lambda.FunctionPerFeature.Tests`, `SliceFx.Cli.Tests`), the `SliceFx.Lambda.NativeAotFixture` support project, and benchmarks (`SliceFx.Benchmarks`, `SliceFx.Benchmarks.Runtime`, plus the `SliceFx.Benchmarks.RuntimeApps/Bench{50,100,200}` size-graded scenario apps). CI runs `dotnet test SliceFx.slnx` (whole solution); use `dotnet test tests/<Name>` to target one project, or `dotnet test SliceFx.slnx --filter "FullyQualifiedName~<Substring>"` for a single test.
+
+**Locally, pass `--filter "Category!=RequiresPublish"` unless you are specifically exercising the publish path.** Exactly one test carries that trait — `SliceFx.Cli.Tests.CliFixtureTests.Csharp_client_publishes_trim_safe_under_release_publishtrimmed_full` — and it runs a real `dotnet publish` with `PublishTrimmed=true`, so ILLink alone takes **10+ minutes**. It also belongs to the `DotnetPublish` collection (`[CollectionDefinition("DotnetPublish", DisableParallelization = true)]`), so it cannot overlap other publish-heavy work. Without the filter an unattended `dotnet test SliceFx.slnx` looks hung: the build finishes in under a minute and then `SliceFx.Cli.Tests` sits there with near-zero CPU while a child process trims. CI runs it unfiltered on purpose — the trim-safety guarantee is worth the wall clock there.
+
+Also smoke-test the main sample when behavior changes (app must be running):
 
 ```bash
 curl http://localhost:5099/health
