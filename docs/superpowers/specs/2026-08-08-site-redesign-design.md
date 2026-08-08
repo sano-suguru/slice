@@ -20,6 +20,11 @@ rounded panels, backdrop blur) is dated, and whose delivery mechanism is unsound
 | `unpkg` lucide | icons | Avoidable — 14 distinct icons, inlineable as SVG. |
 | `fonts.googleapis.com` | Inter / JetBrains Mono / Noto Sans JP | **Kept.** Carries the design identity with no zero-cost substitute. |
 
+None of the five script/stylesheet tags carries a Subresource Integrity hash, so a compromise
+of any of those CDNs executes arbitrary code on the project's homepage. Removing the scripts
+removes the exposure; the remaining Google Fonts tag cannot use SRI (the CSS varies per
+user-agent) but is a stylesheet rather than a script, so the residual surface is far smaller.
+
 A framework whose central enforced constraint is that `SliceFx.Core` never gains a
 `<PackageReference>` (guarded in both `Directory.Build.targets` and CI) should not need a
 third-party JIT compiler running in the visitor's browser to render its own homepage. The
@@ -87,8 +92,15 @@ Tokens are CSS custom properties carrying the draft's palette:
 ```css
 :root {
   --base:    #09090b;   --surface: #18181b;   --line:  #27272a;
-  --accent:  #8b5cf6;   --success: #10b981;
+  --success: #10b981;
   --fg:      #f4f4f5;   --fg-mute: #a1a1aa;   --fg-dim: #8b8b94;
+
+  /* The draft's single --accent is split by use, because one violet cannot
+     clear AA in all three roles. See the contrast table below. */
+  --accent:      #8b5cf6;  /* violet-500 — text on --base           (4.70:1) */
+  --accent-text: #a78bfa;  /* violet-400 — text on --surface        (6.51:1) */
+  --accent-bg:   #7c3aed;  /* violet-600 — background under white   (5.70:1) */
+
   --shadow-hard: 4px 4px 0 0 var(--accent);
 }
 ```
@@ -99,15 +111,23 @@ accent. The current glassmorphism and blue gradients are removed entirely.
 
 ### Deviations from the draft: contrast
 
-Three of the draft's greys fail WCAG AA (4.5:1) for body text against `--base`:
+Every foreground/background pair in the draft was measured against its *actual* backdrop.
+Five fail WCAG AA (4.5:1) for body text:
 
-| Use | Draft | Measured | Replaced with |
+| Use | Draft pair | Measured | Replaced with |
 |---|---|---|---|
-| Footer links, small text | `zinc-500` #71717a | **4.06:1** ✗ | `--fg-mute` #a1a1aa (7.7:1) |
-| `.token.comment` | #52525b | **2.59:1** ✗ | `--fg-dim` #8b8b94 (5.3:1) |
-| CLI block comment line | `zinc-600` #52525b | **2.59:1** ✗ | `--fg-dim` #8b8b94 (5.3:1) |
+| **Ticker band (whole band)** | white on `accent` #8b5cf6 | **4.23:1** ✗ | white on `--accent-bg` #7c3aed (5.70:1) |
+| **Primary CTA button** | white on `accent` #8b5cf6 | **4.23:1** ✗ | white on `--accent-bg` #7c3aed (5.70:1) |
+| Inline `<code>` in feature copy | `accent` #8b5cf6 on `--surface` | **4.18:1** ✗ | `--accent-text` #a78bfa (6.51:1) |
+| Footer links, small text | `zinc-500` #71717a on `--surface` | **3.67:1** ✗ | `--fg-mute` #a1a1aa (7.0:1) |
+| `.token.comment`, CLI comment line | #52525b on `--surface` | **2.29:1** ✗ | `--fg-dim` #8b8b94 (5.25:1) |
 
-The accent `#8b5cf6` measures 4.70:1 against `--base` and is retained for body-sized text.
+The accent `#8b5cf6` measures 4.70:1 against `--base` and is retained for text there — that
+role alone, which is why the token is split three ways above.
+
+Measuring against the true backdrop matters: the code block and the footer both sit on
+`--surface`, not `--base`, and evaluating them against `--base` understates the problem by
+roughly 0.4 points in each case.
 
 The draft's `tailwind.config` also defines `colors.base`, which collides with Tailwind's
 built-in `text-base` font-size utility (visible in the logo's `font-bold text-base text-white`).
@@ -148,6 +168,30 @@ two blocks under `#positioning`. No sentence is dropped; the heading hierarchy l
 | Footer `href="#"` × 6 | placeholders | NuGet package pages (`nuget.org/packages/SliceFx.Core` etc.) and real docs URLs |
 | `v0.x_PREVIEW` | would drift from `Directory.Build.props` | `0.x preview` — no pinned version baked into the page |
 | `lucide@latest` | unpinned | eliminated with the dependency (inline SVG) |
+| The generator "emits ... route metadata, OpenAPI projections, and strictly-typed C#/TypeScript clients" | Misattributed. The generator emits the **route manifest**; `slicefx openapi` and `slicefx client` read that manifest to produce the OpenAPI document and the clients (`docs/cli.md:128`) | Split the sentence: the generator emits registrations and the manifest; the CLI projects OpenAPI and clients from it |
+| "the CLI classifies every endpoint's portability **at build time**" | Two errors. Classification happens at build time in the *generator*, not in the CLI; the CLI reads the result. And `slicefx openapi` excludes `aspnet-only` routes by default (`docs/cli.md:137`), so it is not "every endpoint" | "The generator classifies portability at build time; `slicefx routes` reports it" |
+
+### Code sample drift
+
+The draft's hero code sample does not match the sample it depicts —
+`samples/SliceFx.Sample/Features/Users/CreateUser.cs`:
+
+| Draft | Actual |
+|---|---|
+| `store.AddAsync(req, ct)` | `store.AddAsync(req.Name, req.Email, ct)` |
+| `record Response(Guid Id, string Name)` | `record Response(Guid Id, string Name, string Email, DateTime CreatedAt)` |
+| `Summary = "Create user"` | `Summary = "Create a new user"` |
+
+A landing page that sells the elimination of drift must not itself drift from the repository
+it documents. All three code windows are transcribed verbatim from the tree (the current site
+already does this), and step 5 of Verification checks them against source.
+
+### Dead anchors
+
+The draft defines only `features`, `portability`, `cmdText` and `copyStatus` as IDs, but links
+to `#code` **twice** — from the nav and from the hero's primary call to action, "View
+Architecture". Both are inert. Restoring the full section list gives `#code` a target; the
+verification step below checks every in-page anchor resolves.
 
 The ticker band keeps the draft's shape with four statements that hold: `Core FrameworkReference
 only`, `Native AOT-minded`, `WASI dispatch (experimental)`, `Generated contracts`.
@@ -161,17 +205,26 @@ its verbosity.
 
 ## SEO and accessibility
 
-**Preserved in full:** canonical link, `rel=sitemap`, three `hreflang` alternates, nine Open
-Graph properties, four Twitter Card properties, the `SoftwareApplication` JSON-LD block, the
-skip link, `aria-label="Primary navigation"`, and `tabindex="-1"` on `#main-content`.
+**Preserved in full:** canonical link, `rel=sitemap`, `<meta name="robots" content="index,
+follow">`, three `hreflang` alternates, nine Open Graph properties, four Twitter Card
+properties, the `SoftwareApplication` JSON-LD block, the skip link, `aria-label="Primary
+navigation"`, `tabindex="-1"` on `#main-content`, and `html { scroll-padding-top: 5rem }` —
+without which every anchor target lands underneath the 64px sticky nav. The draft carries
+`scroll-smooth` but drops the padding.
 
 **Added:**
 - A visible `:focus-visible` ring (absent from the draft) — a 2px accent outline, matching the
   hard-edged visual language.
-- `prefers-reduced-motion` suppression of the draft's hover translate.
+- `prefers-reduced-motion` suppression of both the draft's hover translate **and**
+  `scroll-behavior: smooth`.
 - `tabindex="0"` on `<pre>` blocks. The draft's `no-scrollbar` rule hides the scrollbar on
   horizontally scrolling code, which leaves keyboard users unable to read past the fold without
   it.
+- `aria-live="polite"` on `#copyStatus`. The copy button's result is announced to no one today
+  — a defect the current site shares.
+- `rel="noopener noreferrer"` on both `target="_blank"` links.
+- The copy button bound via `addEventListener` in `site.js` rather than an inline `onclick`,
+  which keeps a future Content-Security-Policy possible.
 
 ## Verification
 
@@ -180,6 +233,9 @@ skip link, `aria-label="Primary navigation"`, and `tabindex="-1"` on `#main-cont
    both the `navigator.clipboard` and `execCommand` fallback paths.
 3. **Disable JavaScript and confirm both languages remain readable.**
 4. Check layout at 320 / 768 / 1280 px.
-5. Verify every link resolves — `docs/*.md` targets, NuGet URLs, GitHub URLs.
-6. Re-measure contrast ratios against the table above.
-7. Confirm no CI impact: `docs/` is outside `dotnet format`'s scope and `pages.yml` is untouched.
+5. Verify every link resolves — in-page anchors (no repeat of the draft's dead `#code`),
+   `docs/*.md` targets, NuGet URLs, GitHub URLs.
+6. Diff each of the three code windows against its source file in the tree.
+7. Re-measure every foreground/background pair against its actual backdrop, not against
+   `--base` by default.
+8. Confirm no CI impact: `docs/` is outside `dotnet format`'s scope and `pages.yml` is untouched.
