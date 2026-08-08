@@ -14,8 +14,8 @@
     "@bytecodealliance/preview2-shim": "0.19.0"
   },
   "devDependencies": {
-    "@bytecodealliance/jco": "1.25.2",
+    "@bytecodealliance/jco": "1.26.1",
     "binaryen": "131.0.0",
-    "wrangler": "4.114.0"
+    "wrangler": "4.118.0"
   }
 }
