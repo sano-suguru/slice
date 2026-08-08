@@ -520,6 +520,76 @@ slicefx openapi --output openapi.json</pre>
             </div>
         </section>
 
+        <!-- ===== Engineering ============================================= -->
+        <section id="engineering" class="band">
+            <div class="wrap sect">
+                <p class="label sect__eyebrow"><span class="lang-ja">技術詳細</span><span class="lang-en">Engineering deep dives</span></p>
+                <h2 class="h-lg sect__title"><span class="lang-ja">設計の意思決定と運用基準</span><span class="lang-en">Design decisions and operating criteria</span></h2>
+                <p class="sect__lede">
+                    <span class="lang-ja">SliceFx がどんな原則で動いていて、実運用に向けてどの基準をまだ満たす必要があるかをまとめたドキュメント群です。</span><span class="lang-en">How SliceFx is built, what invariants it defends, and which production-readiness criteria it still needs to meet.</span>
+                </p>
+
+                <div class="docs">
+                    <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/design-decisions.md">
+                        <p class="label doc__num">01</p>
+                        <h3 class="doc__title"><span class="lang-ja">設計判断 FAQ</span><span class="lang-en">Design decisions FAQ</span></h3>
+                        <p class="doc__body"><span class="lang-ja">なぜ <code>IMediator</code> を入れないか、なぜ <code>CreateSlimBuilder</code> か、なぜインクリメンタル生成か。よく聞かれる設計判断をまとめています。</span><span class="lang-en">Why no <code>IMediator</code>, why <code>CreateSlimBuilder</code>, why an incremental generator. Frequently asked design questions, answered.</span></p>
+                        <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
+                    </a>
+
+                    <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/source-generator.md">
+                        <p class="label doc__num">02</p>
+                        <h3 class="doc__title"><span class="lang-ja">ソースジェネレータ</span><span class="lang-en">Source generator</span></h3>
+                        <p class="doc__body"><span class="lang-ja">機能定義、移植性、検証、移行時の重複をカバーする SLICE 診断、ルートマニフェストのスキーマ、インクリメンタルキャッシュの仕組み。</span><span class="lang-en">SLICE diagnostics for feature shape, portability, validation, and migration overlap, plus the route manifest schema and incremental cache shape.</span></p>
+                        <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
+                    </a>
+
+                    <div class="panel doc doc--static">
+                        <p class="label doc__num">03</p>
+                        <h3 class="doc__title"><span class="lang-ja">移行ガイド</span><span class="lang-en">Migration guides</span></h3>
+                        <p class="doc__body"><span class="lang-ja">既存の Minimal API や MVC コントローラーから、1エンドポイントずつ機能ファイルへ移す PoC 手順。</span><span class="lang-en">Endpoint-by-endpoint PoC paths from existing Minimal APIs or MVC controllers into feature files.</span></p>
+                        <p class="doc__cta label">
+                            <span class="lang-ja"><a href="https://github.com/sano-suguru/slicefx/blob/main/docs/migrations/from-minimal-api.md">Minimal API</a> ・ <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/migrations/from-controllers.md">MVC</a></span>
+                            <span class="lang-en"><a href="https://github.com/sano-suguru/slicefx/blob/main/docs/migrations/from-minimal-api.md">Minimal API</a> · <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/migrations/from-controllers.md">Controllers</a></span>
+                        </p>
+                    </div>
+
+                    <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">
+                        <p class="label doc__num">04</p>
+                        <h3 class="doc__title"><span class="lang-ja">ASP.NET 機能と逃げ道</span><span class="lang-en">ASP.NET features and escape hatches</span></h3>
+                        <p class="doc__body"><span class="lang-ja">SliceFx では何が使えるか。認可・レート制限・CORS・キャッシュ・検証の拡張パス、そして ASP.NET / WASI / Lambda 間でハンドラをポータブルに保つためのバインディング規則。</span><span class="lang-en">What you keep: Authorization, rate limiting, CORS, caching, custom validation with <code>ISliceValidator&lt;T&gt;</code>, and how binding rules differ between ASP.NET (plain Minimal API) and portable targets (WASI / Lambda).</span></p>
+                        <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
+                    </a>
+
+                    <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/aot.md">
+                        <p class="label doc__num">05</p>
+                        <h3 class="doc__title"><span class="lang-ja">NativeAOT デプロイ</span><span class="lang-en">NativeAOT deployment</span></h3>
+                        <p class="doc__body"><span class="lang-ja"><code>[assembly: SliceAspNetAot]</code> で AOT-safe 生成モードに切替。JIT なし・起動数 ms のネイティブバイナリへ発行、distroless コンテナに収める手順。</span><span class="lang-en">Opt in with <code>[assembly: SliceAspNetAot]</code> for reflection-free generated dispatch. Publish a native binary — no JIT, millisecond cold start — and drop it in a distroless container image.</span></p>
+                        <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
+                    </a>
+
+                    <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/production-readiness.md">
+                        <p class="label doc__num">06</p>
+                        <h3 class="doc__title"><span class="lang-ja">プロダクション準備基準</span><span class="lang-en">Production readiness targets</span></h3>
+                        <p class="doc__body"><span class="lang-ja">まだ達成済みの主張ではありません。6 つの強み保全インバリアント、ベンチマーク基準値、perf ゲート、採用マトリクスをまとめています。</span><span class="lang-en">Targets, not a completed claim: strength-preservation invariants, benchmark baselines, perf gates, and the adoption matrix.</span></p>
+                        <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
+                    </a>
+
+                    <a class="panel doc" href="perf/latest.svg">
+                        <p class="label doc__num">07</p>
+                        <h3 class="doc__title"><span class="lang-ja">最新ベンチ結果</span><span class="lang-en">Latest benchmark chart</span></h3>
+                        <p class="doc__body"><span class="lang-ja">毎晩の GitHub Actions perf 実行から生成される、ソースジェネレータの ColdRun / WarmRun_NoOpEdit SVG チャート。</span><span class="lang-en">An SVG chart generated from the nightly GitHub Actions perf run for source-generator ColdRun and WarmRun_NoOpEdit timings.</span></p>
+                        <p class="doc__cta label"><span class="lang-ja">SVG を開く</span><span class="lang-en">Open SVG</span></p>
+                    </a>
+                </div>
+
+                <p class="doclinks">
+                    <span class="lang-ja">GitHub ドキュメント: <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/cli.md">CLI コマンド</a> ・ <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/openapi.md">OpenAPI</a> ・ <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET 機能</a> ・ <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/aot.md">Native AOT</a> ・ <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/lambda.md">Lambda ホスティング</a> ・ <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/migrations/from-minimal-api.md">移行ガイド</a> ・ <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/product-direction.md">プロダクト方針</a></span>
+                    <span class="lang-en">GitHub docs: <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/cli.md">CLI commands</a> · <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/openapi.md">OpenAPI</a> · <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET features</a> · <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/aot.md">Native AOT</a> · <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/lambda.md">Lambda hosting</a> · <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/migrations/from-minimal-api.md">Migration guides</a> · <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/product-direction.md">Product direction</a></span>
+                </p>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">

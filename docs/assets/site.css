@@ -978,6 +978,67 @@ code[data-kind="command"]::before {
     }
 }
 
+/* ---------- Docs grid --------------------------------------------------- */
+
+.docs {
+    display: grid;
+    gap: 1rem;
+}
+
+.doc {
+    display: block;
+    padding: 1.5rem;
+    text-decoration: none;
+}
+
+.doc:not(.doc--static):hover {
+    border-color: var(--accent);
+}
+
+.doc__num {
+    margin-bottom: 0.75rem;
+    color: var(--accent);
+}
+
+.doc__title {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.doc__body {
+    color: var(--fg-mute);
+    font-size: 0.875rem;
+}
+
+.doc__cta {
+    margin-top: 1rem;
+    color: var(--accent-text);
+}
+
+.doclinks {
+    margin-top: 2rem;
+    color: var(--fg-mute);
+    font-size: 0.875rem;
+    line-height: 2;
+}
+
+.doclinks a {
+    color: var(--accent-text);
+}
+
+@media (min-width: 640px) {
+    .docs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .docs {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {
