@@ -365,6 +365,90 @@ slicefx client typescript --output slice-api-client.ts</pre>
             </div>
         </section>
 
+        <!-- ===== Code ==================================================== -->
+        <section id="code" class="band">
+            <div class="wrap sect">
+                <h2 class="h-lg sect__title">Hello, SliceFx</h2>
+                <p class="sect__lede">
+                    <span class="lang-ja">リクエスト、レスポンス、ハンドラー、バリデーション、フィルターまで、機能に関わるコードを1つのファイルにまとめられます。</span><span class="lang-en">Request, response, handler, validation, and filters in one feature file.</span>
+                </p>
+
+                <div class="code code--stack">
+                    <div class="code__bar">
+                        <span>Features/Users/CreateUser.cs</span>
+                        <span class="code__chip"><span class="lang-ja">C# 機能</span><span class="lang-en">C# feature</span></span>
+                    </div>
+<pre tabindex="0"><span class="token keyword">using</span> System.ComponentModel.DataAnnotations;
+<span class="token keyword">using</span> SliceFx.Sample.Services;
+
+<span class="token keyword">namespace</span> SliceFx.Sample.Features.Users;
+
+[<span class="token type">Feature</span>(<span class="token string">"POST /users"</span>, Summary = <span class="token string">"Create a new user"</span>)]
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token type">CreateUser</span>
+{
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token type">Request</span>(
+        [<span class="token type">Required</span>, <span class="token type">MinLength</span>(2)] <span class="token keyword">string</span> Name,
+        [<span class="token type">Required</span>, <span class="token type">EmailAddress</span>] <span class="token keyword">string</span> Email);
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token type">Response</span>(Guid Id, <span class="token keyword">string</span> Name, <span class="token keyword">string</span> Email, DateTime CreatedAt);
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">async</span> Task&lt;<span class="token type">Response</span>&gt; <span class="token function">Handle</span>(<span class="token type">Request</span> req, <span class="token type">IUserStore</span> store, CancellationToken ct)
+    {
+        <span class="token keyword">var</span> user = <span class="token keyword">await</span> store.<span class="token function">AddAsync</span>(req.Name, req.Email, ct);
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token type">Response</span>(user.Id, user.Name, user.Email, user.CreatedAt);
+    }
+}</pre>
+                </div>
+
+                <div class="code code--stack">
+                    <div class="code__bar">
+                        <span>Program.cs</span>
+                        <span class="code__chip"><span class="lang-ja">ホスト設定</span><span class="lang-en">Host setup</span></span>
+                    </div>
+<pre tabindex="0"><span class="token keyword">using</span> SliceFx.Sample.Services;
+
+<span class="token keyword">var</span> builder = WebApplication.<span class="token function">CreateSlimBuilder</span>(args);
+
+builder.Services.<span class="token function">AddSlice</span>();
+builder.Services.<span class="token function">AddOpenApi</span>();
+builder.Services.<span class="token function">AddSingleton</span>(TimeProvider.System);
+builder.Services.<span class="token function">AddSingleton</span>&lt;<span class="token type">IUserStore</span>, <span class="token type">InMemoryUserStore</span>&gt;();
+builder.Services.<span class="token function">AddSingleton</span>&lt;<span class="token type">AuditLog</span>&gt;();
+builder.Services.<span class="token function">AddKeyedSingleton</span>&lt;<span class="token type">IClock</span>, <span class="token type">SystemClock</span>&gt;(<span class="token string">"promotion"</span>);
+<span class="token comment">// Factory-lambda registration avoids ActivatorUtilities reflection — AOT-safe under full-trim NativeAOT.</span>
+<span class="token comment">// UserAuthFilter populates this per-request; GetCurrentUser injects it directly.</span>
+builder.Services.<span class="token function">AddScoped</span>(_ =&gt; <span class="token keyword">new</span> <span class="token type">CurrentUser</span>());
+
+<span class="token keyword">var</span> app = builder.<span class="token function">Build</span>();
+
+app.<span class="token function">MapSlices</span>(); <span class="token comment">// &lt;-- Registers all features automatically</span>
+<span class="token keyword">if</span> (app.Environment.IsDevelopment())
+{
+    app.<span class="token function">MapOpenApi</span>();
+}
+
+app.<span class="token function">Run</span>();</pre>
+                </div>
+
+                <div class="code code--stack">
+                    <div class="code__bar">
+                        <span>SliceFx CLI</span>
+                        <span class="code__chip"><span class="lang-ja">コマンド</span><span class="lang-en">Commands</span></span>
+                    </div>
+<pre tabindex="0">slicefx routes
+slicefx routes --format json
+slicefx client csharp --output SliceApiClient.g.cs
+slicefx client typescript --output slice-api-client.ts
+slicefx openapi --output openapi.json</pre>
+                </div>
+
+                <div class="note">
+                    <p class="note__head"><span class="lang-ja">ポータビリティのヒント: <code>[FromServices]</code></span><span class="lang-en">Portability tip: <code>[FromServices]</code></span></p>
+                    <p><span class="lang-ja">ASP.NET パスのバインディングは生の Minimal API と同一で、登録済みサービス(具象・インターフェイス問わず)は <code>[FromServices]</code> なしで DI 解決されます。WASI / Lambda にもポータブルにしたい場合は、具象クラスの DI サービスに <code>[FromServices]</code>、キー付きサービスに <code>[FromKeyedServices(key)]</code> を付けてください。<a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/parameter-binding.md">パラメータバインディングの詳細 →</a></span><span class="lang-en">On the ASP.NET path binding is plain Minimal API — any registered service (concrete or interface) resolves from DI automatically. Annotate concrete services with <code>[FromServices]</code> (keyed: <code>[FromKeyedServices(key)]</code>) only to keep handlers portable across WASI and Lambda, where the generator uses a compile-time heuristic. <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/parameter-binding.md">Parameter binding details →</a></span></p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">

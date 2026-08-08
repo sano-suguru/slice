@@ -863,6 +863,30 @@ code[data-kind="command"]::before {
     }
 }
 
+/* ---------- Stacked code windows / notes -------------------------------- */
+
+.code--stack {
+    margin-bottom: 2rem;
+}
+
+.note {
+    border: 2px solid var(--accent);
+    background: var(--surface);
+    padding: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--fg-mute);
+}
+
+.note__head {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: var(--accent-text);
+}
+
+.note a {
+    color: var(--accent-text);
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {
