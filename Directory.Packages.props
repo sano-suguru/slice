@@ -20,7 +20,7 @@
     <!-- Transitive-only pin (via Microsoft.AspNetCore.OpenApi); no direct PackageReference anywhere.
          Patches GHSA-v5pm-xwqc-g5wc (stack-overflow DoS on circular schema refs). Raise alongside
          Microsoft.AspNetCore.OpenApi if that package's own Microsoft.OpenApi dependency moves past 2.x. -->
-    <PackageVersion Include="Microsoft.OpenApi" Version="2.7.5" />
+    <PackageVersion Include="Microsoft.OpenApi" Version="3.9.0" />
     <!-- The consumer Roslyn floor. CSharp is what SliceFx.SourceGenerator compiles
          against, so it sets the minimum Roslyn a consumer's compiler must provide.
          Workspaces is that same floor seen from the IDE side: the code fix project
