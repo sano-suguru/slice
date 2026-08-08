@@ -625,10 +625,12 @@ Expected: both the ticker and `.btn--primary` reference `--accent-bg`, and the r
 cd /Users/sanosuguru/dev/slicefx
 grep -c 'Third-party production adoption: 0' docs/index.html
 grep -c '第三者による本番採用は 0' docs/index.html
-grep -c 'slicefx-inbox' docs/index.html
+grep -o 'href="https://github.com/sano-suguru/slicefx-inbox"' docs/index.html | wc -l
 ```
 
-Expected: `1`, `1`, `2` (one per language).
+Expected: `1`, `1`, `2` — one disclosure per language, each carrying one link. Count the `href`
+rather than the bare string `slicefx-inbox`, which appears twice per link (in the attribute and
+in the link text) and so reads `4`.
 
 - [ ] **Step 7: Commit**
 

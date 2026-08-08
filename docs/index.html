@@ -94,6 +94,107 @@
     </nav>
 
     <main id="main-content" tabindex="-1">
+
+        <!-- ===== Hero ===================================================== -->
+        <section class="band blueprint">
+            <div class="wrap hero">
+                <div class="hero__copy">
+                    <p class="chip label">
+                        <span class="chip__dot" aria-hidden="true"></span>
+                        <span class="lang-ja">機能ファイルから API 契約を生成する .NET API フレームワーク。</span><span class="lang-en">Generate API contracts from feature files.</span>
+                    </p>
+
+                    <h1 class="h-xl hero__title">
+                        <span class="lang-ja">1ファイル。<br>1つの機能。<br><span class="hero__accent">API契約は自動生成。</span></span>
+                        <span class="lang-en">One file.<br>One feature.<br><span class="hero__accent">Generated API contracts.</span></span>
+                    </h1>
+
+                    <p class="hero__lede">
+                        <span class="lang-ja">Minimal API の書き味はそのまま。1つの機能定義から登録、診断、型付きクライアントを生成します。</span>
+                        <span class="lang-en">Keep Minimal APIs. Generate registration, checks, and typed clients from one feature definition.</span>
+                    </p>
+
+                    <div class="hero__actions">
+                        <a href="#code" class="btn btn--primary">
+                            <span class="lang-ja">コードを見る</span><span class="lang-en">View code</span>
+                        </a>
+                        <div class="copy">
+                            <code id="copyCommand" data-kind="command">dotnet run --project samples/SliceFx.Sample</code>
+                            <button id="copyCommandButton" type="button" class="copy__btn" aria-label="Copy command">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true">
+                                    <rect x="9" y="9" width="13" height="13"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+
+                    <ul class="pills">
+                        <li class="pill label"><span class="lang-ja">Native AOT を意識</span><span class="lang-en">Native AOT-minded</span></li>
+                        <li class="pill label"><span class="lang-ja">SLICE 診断</span><span class="lang-en">SLICE diagnostics</span></li>
+                        <li class="pill label"><span class="lang-ja">Core は FrameworkReference のみ</span><span class="lang-en">Framework-only Core</span></li>
+                    </ul>
+                </div>
+
+                <div class="hero__code">
+                    <div class="code code--flush">
+                        <div class="code__bar">
+                            <span>Features/Users/CreateUser.cs</span>
+                            <span class="code__chip"><span class="lang-ja">C# 機能</span><span class="lang-en">C# feature</span></span>
+                        </div>
+<pre tabindex="0"><span class="token keyword">using</span> System.ComponentModel.DataAnnotations;
+<span class="token keyword">using</span> SliceFx.Sample.Services;
+
+<span class="token keyword">namespace</span> SliceFx.Sample.Features.Users;
+
+[<span class="token type">Feature</span>(<span class="token string">"POST /users"</span>, Summary = <span class="token string">"Create a new user"</span>)]
+<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token type">CreateUser</span>
+{
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token type">Request</span>(
+        [<span class="token type">Required</span>, <span class="token type">MinLength</span>(2)] <span class="token keyword">string</span> Name,
+        [<span class="token type">Required</span>, <span class="token type">EmailAddress</span>] <span class="token keyword">string</span> Email);
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token type">Response</span>(Guid Id, <span class="token keyword">string</span> Name, <span class="token keyword">string</span> Email, DateTime CreatedAt);
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">async</span> Task&lt;<span class="token type">Response</span>&gt; <span class="token function">Handle</span>(<span class="token type">Request</span> req, <span class="token type">IUserStore</span> store, CancellationToken ct)
+    {
+        <span class="token keyword">var</span> user = <span class="token keyword">await</span> store.<span class="token function">AddAsync</span>(req.Name, req.Email, ct);
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token type">Response</span>(user.Id, user.Name, user.Email, user.CreatedAt);
+    }
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Release status =========================================== -->
+        <section class="band">
+            <div class="wrap release">
+                <div class="release__panel">
+                    <p class="release__head">
+                        <span class="lang-ja">リリース状況: 0.x preview が NuGet で公開中 (2026-06-01)。</span><span class="lang-en">Release status: a 0.x preview is available on NuGet (2026-06-01).</span>
+                    </p>
+                    <p class="release__body">
+                        <span class="lang-ja">pre-1.0 の実験的ソフトウェアです。API は安定版リリース前に変更される可能性があります。第三者による本番採用は 0。Maintainer dogfooding（<a href="https://github.com/sano-suguru/slicefx-inbox">slicefx-inbox</a>、Fermyon Cloud 稼働中）: 1。公開済み dogfooding ログは 0。</span><span class="lang-en">Pre-1.0 experimental software. APIs may change before a stable release. Third-party production adoption: 0. Maintainer dogfooding (<a href="https://github.com/sano-suguru/slicefx-inbox">slicefx-inbox</a>, live on Fermyon Cloud): 1. Published dogfooding logs: 0.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Ticker ================================================== -->
+        <section class="band ticker">
+            <div class="wrap ticker__inner label">
+                <span><span class="lang-ja">Core は FrameworkReference のみ</span><span class="lang-en">Core FrameworkReference only</span></span>
+                <span class="ticker__sep" aria-hidden="true">/</span>
+                <span><span class="lang-ja">Native AOT を意識</span><span class="lang-en">Native AOT-minded</span></span>
+                <span class="ticker__sep" aria-hidden="true">/</span>
+                <span><span class="lang-ja">WASI ディスパッチ (実験的)</span><span class="lang-en">WASI dispatch (experimental)</span></span>
+                <span class="ticker__sep" aria-hidden="true">/</span>
+                <span><span class="lang-ja">API 契約を生成</span><span class="lang-en">Generated contracts</span></span>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">

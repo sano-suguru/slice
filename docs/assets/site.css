@@ -412,6 +412,199 @@ code[data-kind="command"]::before {
     }
 }
 
+/* ---------- Hero ------------------------------------------------------- */
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    background: var(--base);
+}
+
+.hero__copy {
+    padding: 3rem 1.5rem;
+}
+
+.hero__title {
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.hero__accent {
+    color: var(--accent);
+}
+
+.hero__lede {
+    max-width: 32rem;
+    margin-bottom: 2rem;
+    color: var(--fg-mute);
+    font-family: "JetBrains Mono", "Noto Sans JP", monospace;
+    font-size: 0.95rem;
+}
+
+.hero__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.hero__code {
+    border-top: 2px solid var(--line);
+    background: var(--surface);
+}
+
+.code--flush {
+    border: 0;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    padding: 0.4rem 0.75rem;
+    color: var(--accent-text);
+}
+
+.chip__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    flex: none;
+    background: var(--success);
+}
+
+.copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 2px solid var(--line);
+    background: var(--surface);
+    padding: 0.85rem 1rem;
+    min-width: 0;
+}
+
+.copy > code {
+    border: 0;
+    background: none;
+    padding: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+.copy__btn {
+    display: inline-flex;
+    flex: none;
+    border: 0;
+    background: none;
+    color: var(--fg-mute);
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.copy__btn:hover {
+    color: var(--fg);
+}
+
+.pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.pill {
+    border: 2px solid var(--line);
+    padding: 0.4rem 0.75rem;
+    color: var(--fg-mute);
+}
+
+@media (min-width: 1024px) {
+    .hero {
+        flex-direction: row;
+    }
+
+    .hero__copy {
+        width: 50%;
+        padding: 5rem 4rem;
+        border-right: 2px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .hero__code {
+        width: 50%;
+        border-top: 0;
+    }
+
+    .hero__actions {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+/* ---------- Release status --------------------------------------------- */
+
+.release {
+    background: var(--base);
+    padding: 2rem 1.5rem;
+}
+
+.release__panel {
+    border: 2px solid var(--success);
+    background: var(--surface);
+    padding: 1.25rem;
+    font-size: 0.9rem;
+}
+
+.release__head {
+    font-weight: 700;
+    color: var(--success);
+    margin-bottom: 0.5rem;
+}
+
+.release__body {
+    color: var(--fg-mute);
+}
+
+.release__body a {
+    color: var(--accent-text);
+}
+
+/* ---------- Ticker ----------------------------------------------------- */
+/* --accent-bg, never --accent: white on #8b5cf6 is 4.23:1 and fails AA. */
+
+.ticker {
+    background: var(--accent-bg);
+    color: #fff;
+}
+
+.ticker__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+    padding: 1rem 1.5rem;
+    border-inline: 0;
+    text-align: center;
+}
+
+.ticker__sep {
+    opacity: 0.55;
+}
+
+@media (min-width: 640px) {
+    .ticker__inner {
+        justify-content: space-between;
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {
