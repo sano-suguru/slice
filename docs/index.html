@@ -195,6 +195,72 @@
             </div>
         </section>
 
+        <!-- ===== Features ================================================ -->
+        <section id="features" class="band">
+            <div class="wrap split">
+                <div class="split__aside">
+                    <div class="split__sticky">
+                        <h2 class="h-lg split__title">
+                            <span class="lang-ja">SliceFxが<br>解決したいこと</span><span class="lang-en">What<br>SliceFx solves</span>
+                        </h2>
+                        <p class="split__lede">
+                            <span class="lang-ja">ルート、DTO、バリデーション、クライアント、移植性チェックを別々に管理せず、1つの機能ファイルからつなげます。</span><span class="lang-en">Keep routes, DTOs, validation, clients, and portability checks connected to one feature file.</span>
+                        </p>
+                        <dl class="facts label">
+                            <div class="facts__row">
+                                <dt><span class="lang-ja">依存関係</span><span class="lang-en">Dependency</span></dt>
+                                <dd><span class="lang-ja">Core は追加ゼロ</span><span class="lang-en">Zero-added (Core)</span></dd>
+                            </div>
+                            <div class="facts__row">
+                                <dt><span class="lang-ja">起動時リフレクション</span><span class="lang-en">Startup reflection</span></dt>
+                                <dd><span class="lang-ja">なし (生成)</span><span class="lang-en">None (generated)</span></dd>
+                            </div>
+                            <div class="facts__row">
+                                <dt><span class="lang-ja">離脱経路</span><span class="lang-en">Exit path</span></dt>
+                                <dd>Standard MapMethods</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="split__main">
+                    <article class="stagger">
+                        <p class="stagger__num label">01. <span class="lang-ja">局所性</span><span class="lang-en">Locality of behavior</span></p>
+                        <h3 class="h-md stagger__title"><span class="lang-ja">機能単位で構成</span><span class="lang-en">Feature-shaped APIs</span></h3>
+                        <p class="stagger__body">
+                            <span class="lang-ja">1つの静的クラスが1つのエンドポイント。リクエスト、レスポンス、ハンドラー、バリデーションを同じ場所で確認できます。</span><span class="lang-en">One static class maps to one endpoint, keeping request, response, handler, and validation close together.</span>
+                        </p>
+                    </article>
+
+                    <article class="stagger">
+                        <p class="stagger__num label">02. <span class="lang-ja">契約の生成</span><span class="lang-en">Contract generation</span></p>
+                        <h3 class="h-md stagger__title"><span class="lang-ja">API契約がずれにくい</span><span class="lang-en">API contracts stay aligned</span></h3>
+                        <p class="stagger__body">
+                            <span class="lang-ja">ルートメタデータ、互換性レポート、型付きクライアント、OpenAPI projection を、同じ機能ファイルから生成します。</span><span class="lang-en">Route metadata, compatibility reports, typed clients, and OpenAPI projections are generated from the same feature files.</span>
+                        </p>
+                        <div class="code">
+<pre tabindex="0"><span class="token comment"># <span class="lang-ja">同じマニフェストから型付きクライアントを生成</span><span class="lang-en">Typed clients from the same manifest</span></span>
+slicefx client csharp --output SliceApiClient.g.cs
+slicefx client typescript --output slice-api-client.ts</pre>
+                        </div>
+                    </article>
+
+                    <article class="stagger">
+                        <p class="stagger__num label">03. <span class="lang-ja">土台</span><span class="lang-en">Foundation</span></p>
+                        <h3 class="h-md stagger__title"><span class="lang-ja">ASP.NET Core から離れない</span><span class="lang-en">Still ASP.NET Core</span></h3>
+                        <p class="stagger__body">
+                            <span class="lang-ja">Minimal API のバインディング、DI、エンドポイントフィルター、DataAnnotations をそのまま利用できます。必要な場面では ASP.NET 固有の <code>IResult</code> も使えます。</span><span class="lang-en">Keep Minimal API binding, DI, endpoint filters, and DataAnnotations; use ASP.NET-specific <code>IResult</code> when a slice needs it.</span>
+                        </p>
+                    </article>
+
+                    <p class="stagger stagger__note">
+                        <span class="lang-ja">SliceFx は ASP.NET の機能を制限しません。認可・レート制限・キャッシュ・CORS・カスタム検証はそのまま使えます。<a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET 機能とエスケープハッチ →</a></span>
+                        <span class="lang-en">SliceFx doesn't restrict any ASP.NET feature — authorization, rate limiting, caching, CORS, and custom validation all stay available. <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET features and escape hatches →</a></span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">

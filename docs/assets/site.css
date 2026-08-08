@@ -605,6 +605,112 @@ code[data-kind="command"]::before {
     }
 }
 
+/* ---------- Split layout (sticky aside + staggered main) --------------- */
+
+.split {
+    display: flex;
+    flex-direction: column;
+    background: var(--base);
+}
+
+.split__aside {
+    background: var(--surface);
+    border-bottom: 2px solid var(--line);
+}
+
+.split__sticky {
+    padding: 3rem 1.5rem;
+}
+
+.split__title {
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.split__lede {
+    margin-bottom: 2rem;
+    color: var(--fg-mute);
+    font-family: "JetBrains Mono", "Noto Sans JP", monospace;
+    font-size: 0.875rem;
+}
+
+.facts__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-mute);
+}
+
+.facts__row dd {
+    margin: 0;
+    text-align: right;
+}
+
+.stagger {
+    padding: 3rem 1.5rem;
+    border-bottom: 2px solid var(--line);
+}
+
+.stagger:last-child {
+    border-bottom: 0;
+}
+
+.stagger__num {
+    margin-bottom: 1rem;
+    color: var(--accent);
+}
+
+.stagger__title {
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.stagger__body {
+    max-width: 36rem;
+    margin-bottom: 1.5rem;
+    color: var(--fg-mute);
+    font-size: 0.95rem;
+}
+
+.stagger__note {
+    color: var(--fg-mute);
+    font-size: 0.875rem;
+}
+
+.stagger__note a {
+    color: var(--accent);
+}
+
+@media (min-width: 768px) {
+    .split {
+        flex-direction: row;
+    }
+
+    .split__aside {
+        width: 33.333%;
+        flex: none;
+        border-bottom: 0;
+        border-right: 2px solid var(--line);
+    }
+
+    .split__sticky {
+        position: sticky;
+        top: var(--nav-h);
+        padding: 3rem;
+    }
+
+    .split__main {
+        width: 66.667%;
+    }
+
+    .stagger {
+        padding: 3rem;
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {
