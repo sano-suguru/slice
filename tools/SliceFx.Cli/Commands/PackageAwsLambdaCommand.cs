@@ -329,6 +329,11 @@ internal static class PackageAwsLambdaCommand
             process.StartInfo.ArgumentList.Add(arg);
         }
 
+        // MSBuild worker nodes inherit the redirected pipe handles. With node reuse on (the default)
+        // they are reparented and linger for ~15 minutes, so the pipes never reach EOF and the reads
+        // below would block long after the publish itself exited. See issue #67.
+        process.StartInfo.Environment["MSBUILDDISABLENODEREUSE"] = "1";
+
         process.Start();
         var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
         var stderrTask = process.StandardError.ReadToEndAsync(ct);

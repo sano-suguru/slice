@@ -3335,8 +3335,28 @@ public class CliFixtureTests
         Assert.True(tscExit == 0, tscOut + tscErr);
     }
 
-    private static async Task<(int exitCode, string stdout, string stderr)> RunProcessAsync(
-        string fileName, string[] args, string? workingDirectory)
+    // Regression guard for issue #67: leaving node reuse on made the whole assembly hang, because a
+    // reparented MSBuild worker node held the build's stdout pipe open for its full 15-minute idle life.
+    [Fact]
+    public void Spawned_dotnet_processes_disable_msbuild_node_reuse()
+    {
+        var startInfo = CreateDotnetStartInfo("dotnet", ["build"], workingDirectory: null);
+
+        Assert.Equal("1", startInfo.Environment["MSBUILDDISABLENODEREUSE"]);
+    }
+
+    private static readonly TimeSpan ProcessExitTimeout = TimeSpan.FromMinutes(5);
+
+    // Bounded so a child that leaks its stdout handle surfaces as a failure instead of a hang.
+    private static readonly TimeSpan OutputDrainTimeout = TimeSpan.FromMinutes(1);
+
+    // 'dotnet build'/'dotnet publish' start MSBuild worker nodes that inherit the redirected
+    // stdout/stderr write handles. With node reuse on (the default) those nodes are reparented and
+    // linger for ~15 minutes after the build exits, so the pipes never reach EOF and ReadToEndAsync
+    // blocks long after WaitForExitAsync has returned. Disabling reuse ties the worker nodes to the
+    // build that spawned them. See issue #67.
+    private static System.Diagnostics.ProcessStartInfo CreateDotnetStartInfo(
+        string fileName, IEnumerable<string> args, string? workingDirectory)
     {
         var psi = new System.Diagnostics.ProcessStartInfo
         {
@@ -3353,11 +3373,20 @@ public class CliFixtureTests
         {
             psi.WorkingDirectory = workingDirectory;
         }
-        using var process = System.Diagnostics.Process.Start(psi)
+
+        psi.Environment["MSBUILDDISABLENODEREUSE"] = "1";
+        return psi;
+    }
+
+    private static async Task<(int exitCode, string stdout, string stderr)> RunProcessAsync(
+        string fileName, string[] args, string? workingDirectory)
+    {
+        var commandLine = $"{fileName} {string.Join(' ', args)}";
+        using var process = System.Diagnostics.Process.Start(CreateDotnetStartInfo(fileName, args, workingDirectory))
             ?? throw new InvalidOperationException($"Failed to start '{fileName}'.");
         var stdoutTask = process.StandardOutput.ReadToEndAsync();
         var stderrTask = process.StandardError.ReadToEndAsync();
-        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+        using var cts = new CancellationTokenSource(ProcessExitTimeout);
         try
         {
             await process.WaitForExitAsync(cts.Token);
@@ -3365,9 +3394,24 @@ public class CliFixtureTests
         catch (OperationCanceledException)
         {
             process.Kill(entireProcessTree: true);
-            throw new TimeoutException($"'{fileName}' did not exit within the timeout.");
+            throw new TimeoutException($"'{commandLine}' did not exit within the timeout.");
         }
-        return (process.ExitCode, await stdoutTask, await stderrTask);
+
+        return (process.ExitCode, await DrainAsync(stdoutTask, commandLine), await DrainAsync(stderrTask, commandLine));
+    }
+
+    private static async Task<string> DrainAsync(Task<string> readTask, string commandLine)
+    {
+        try
+        {
+            return await readTask.WaitAsync(OutputDrainTimeout);
+        }
+        catch (TimeoutException)
+        {
+            throw new TimeoutException(
+                $"'{commandLine}' exited but its redirected output pipe stayed open, so it could not be drained. " +
+                "Some longer-lived child process inherited the write handle — a reused MSBuild worker node is the usual cause.");
+        }
     }
 
     [Fact]
@@ -4121,29 +4165,12 @@ public class CliFixtureTests
 
         internal async Task BuildAsync()
         {
-            using var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = $"build \"{ProjectFile.FullName}\" --configuration Debug --nologo --verbosity quiet",
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-            }) ?? throw new InvalidOperationException("Could not start dotnet build.");
+            var (exitCode, stdout, stderr) = await RunProcessAsync(
+                "dotnet",
+                ["build", ProjectFile.FullName, "--configuration", "Debug", "--nologo", "--verbosity", "quiet"],
+                workingDirectory: null);
 
-            var stdoutTask = process.StandardOutput.ReadToEndAsync();
-            var stderrTask = process.StandardError.ReadToEndAsync();
-            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
-            try
-            {
-                await process.WaitForExitAsync(cts.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                process.Kill(entireProcessTree: true);
-                throw new TimeoutException(
-                    $"'dotnet build {ProjectFile.Name}' did not exit within the timeout.\nstdout:\n{await stdoutTask}\nstderr:\n{await stderrTask}");
-            }
-
-            Assert.True(process.ExitCode == 0, await stdoutTask + await stderrTask);
+            Assert.True(exitCode == 0, stdout + stderr);
         }
 
         public void Dispose() => Directory.Delete(recursive: true);
