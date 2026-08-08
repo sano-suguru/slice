@@ -276,6 +276,142 @@ code[data-kind="command"]::before {
     font-weight: 700;
 }
 
+/* ---------- Icons ------------------------------------------------------ */
+/* Two inline SVGs only: the GitHub mark and a check glyph. No icon library. */
+
+.i {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+}
+
+.i--check {
+    color: var(--success);
+}
+
+/* ---------- Nav -------------------------------------------------------- */
+
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--base);
+    border-bottom: 2px solid var(--line);
+}
+
+.nav__inner {
+    border-bottom: 0;
+}
+
+.nav__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: var(--nav-h);
+    padding-inline: 1.5rem;
+}
+
+.nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    min-width: 0;
+}
+
+.nav__mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex: none;
+    background: var(--accent-bg);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.nav__word {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.nav__chip {
+    flex: none;
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.5rem;
+    color: var(--fg-mute);
+}
+
+.nav__links,
+.nav__end {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav__links a,
+.nav__mobile a,
+.nav__gh {
+    text-decoration: none;
+    color: var(--fg-mute);
+}
+
+.nav__links a:hover,
+.nav__mobile a:hover,
+.nav__gh:hover {
+    color: var(--accent-text);
+}
+
+.nav__end {
+    gap: 1rem;
+}
+
+.nav__gh {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lang-select {
+    border: 2px solid var(--line);
+    background: var(--surface);
+    color: var(--fg);
+    padding: 0.35rem 0.5rem;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.nav__mobile {
+    display: none;
+    gap: 1rem;
+    padding: 0 1.5rem 0.75rem;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .nav {
+        --nav-h: 3.5rem;
+    }
+
+    .nav__links {
+        display: none;
+    }
+
+    .nav__mobile {
+        display: flex;
+    }
+
+    .nav__chip,
+    .nav__gh-text {
+        display: none;
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {
