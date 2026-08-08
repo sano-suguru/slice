@@ -16,7 +16,13 @@ import {
 } from "@bytecodealliance/preview2-shim/cli";
 import { monotonicClock, wallClock } from "@bytecodealliance/preview2-shim/clocks";
 import { preopens, types as fsTypes } from "@bytecodealliance/preview2-shim/filesystem";
-import { error as ioError, poll as ioPoll, streams } from "@bytecodealliance/preview2-shim/io";
+import {
+  error as ioError,
+  inputStreamCreate,
+  outputStreamCreate,
+  poll as ioPoll,
+  streams,
+} from "@bytecodealliance/preview2-shim/io";
 import { random } from "@bytecodealliance/preview2-shim/random";
 import { TcpSocket } from "./stubs/tcp.js";
 import { UdpSocket, IncomingDatagramStream, OutgoingDatagramStream } from "./stubs/udp.js";
@@ -50,21 +56,24 @@ class Fields {
 class IncomingBody {
   #data;
   constructor(data) { this.#data = data instanceof Uint8Array ? data : new Uint8Array(0); }
+  // WIT returns result<input-stream>; jco wraps the return value in the ok
+  // variant itself (and a throw in the err variant), so return the bare
+  // resource — returning {tag:'ok'} here would be lowered as a double wrap.
   stream() {
     const data = this.#data;
     let pos = 0;
-    return {
-      tag: 'ok',
-      val: new streams.InputStream({
-        blockingRead(len) {
-          const n = Math.min(Number(len), data.length - pos);
-          if (n <= 0) return new Uint8Array(0); // EOF → empty → C# breaks loop
-          const chunk = data.slice(pos, pos + n);
-          pos += n;
-          return chunk;
-        },
-      }),
-    };
+    // preview2-shim's InputStream takes its handler through the exported
+    // factory, not the constructor; `new streams.InputStream(handler)` leaves
+    // `handler` undefined and every read throws.
+    return inputStreamCreate({
+      blockingRead(len) {
+        const n = Math.min(Number(len), data.length - pos);
+        if (n <= 0) return new Uint8Array(0); // EOF → empty → C# breaks loop
+        const chunk = data.slice(pos, pos + n);
+        pos += n;
+        return chunk;
+      },
+    });
   }
   static finish(_body) {}
 }
@@ -83,7 +92,8 @@ class IncomingRequest {
   headers() { return this.#headers; }
   authority() { return undefined; }
   scheme() { return undefined; }
-  consume() { return { tag: 'ok', val: new IncomingBody(this.#body) }; }
+  // result<incoming-body>; bare return, same reason as IncomingBody.stream().
+  consume() { return new IncomingBody(this.#body); }
 }
 
 // OutgoingBody – accumulates response body bytes written by the wasm component.
@@ -91,7 +101,7 @@ class OutgoingBody {
   #chunks = [];
   write() {
     const chunks = this.#chunks;
-    return new streams.OutputStream({ write(buf) { chunks.push(new Uint8Array(buf)); } });
+    return outputStreamCreate({ write(buf) { chunks.push(new Uint8Array(buf)); } });
   }
   collect() {
     const total = this.#chunks.reduce((s, c) => s + c.length, 0);
