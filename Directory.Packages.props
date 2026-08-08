@@ -17,10 +17,17 @@
          PrivateAssets="all", contributes no runtime API, so unlike the two
          CodeAnalysis entries below this is NOT part of the consumer Roslyn floor. -->
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
-    <!-- Transitive-only pin (via Microsoft.AspNetCore.OpenApi); no direct PackageReference anywhere.
-         Patches GHSA-v5pm-xwqc-g5wc (stack-overflow DoS on circular schema refs). Raise alongside
-         Microsoft.AspNetCore.OpenApi if that package's own Microsoft.OpenApi dependency moves past 2.x. -->
-    <PackageVersion Include="Microsoft.OpenApi" Version="2.7.5" />
+    <!-- Version-forcing pin, not a consumed dependency. Nothing here calls the Microsoft.OpenApi
+         API; it arrives transitively via Microsoft.AspNetCore.OpenApi, which still asks for the
+         vulnerable 2.0.0, and NuGet's nearest-wins resolution keeps it there. The lone direct
+         PackageReference (samples/SliceFx.Sample) exists only to override that, patching
+         GHSA-v5pm-xwqc-g5wc (stack-overflow DoS on circular schema refs).
+
+         Stay on the newest 2.x. Do NOT take 3.x until Microsoft.AspNetCore.OpenApi's own
+         Microsoft.OpenApi dependency moves past 2.x: it ships an XML-comment source generator
+         whose emitted code assigns IOpenApiMediaType.Example, which 3.x made read-only, so 3.x
+         fails to build inside Microsoft's generated code where we cannot patch it. -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.11.0" />
     <!-- The consumer Roslyn floor. CSharp is what SliceFx.SourceGenerator compiles
          against, so it sets the minimum Roslyn a consumer's compiler must provide.
          Workspaces is that same floor seen from the IDE side: the code fix project
