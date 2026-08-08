@@ -887,6 +887,63 @@ code[data-kind="command"]::before {
     color: var(--accent-text);
 }
 
+/* ---------- Cards ------------------------------------------------------ */
+
+.sect__lede--dim {
+    color: var(--fg-dim);
+    font-size: 0.875rem;
+}
+
+.cards {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.card {
+    padding: 1.5rem;
+}
+
+.card p {
+    color: var(--fg-mute);
+    font-size: 0.9rem;
+}
+
+.card__name {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.card--portable .card__name {
+    color: var(--success);
+}
+
+.card--partial .card__name {
+    color: #eab308;
+}
+
+.card--aspnet .card__name {
+    color: var(--accent-text);
+}
+
+.card--portable:hover {
+    border-color: var(--success);
+}
+
+.card--partial:hover {
+    border-color: #eab308;
+}
+
+.card--aspnet:hover {
+    border-color: var(--accent);
+}
+
+@media (min-width: 768px) {
+    .cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {

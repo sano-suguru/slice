@@ -449,6 +449,40 @@ slicefx openapi --output openapi.json</pre>
             </div>
         </section>
 
+        <!-- ===== Portability ============================================= -->
+        <section id="portability" class="band">
+            <div class="wrap sect">
+                <p class="label sect__eyebrow">WASI / WebAssembly / edge</p>
+                <h2 class="h-lg sect__title">
+                    <span class="lang-ja">まずは ASP.NET Core。<br>WASI は必須ではありません</span><span class="lang-en">Start with ASP.NET Core.<br>WASI is optional.</span>
+                </h2>
+                <p class="sect__lede">
+                    <span class="lang-ja">SliceFx の既定は普通の ASP.NET Core アプリです。WASI / edge は、同じ機能ファイルを将来 ASP.NET 以外にも持っていけるかを確認するための実験的な選択肢です。</span><span class="lang-en">SliceFx defaults to a normal ASP.NET Core app. WASI / edge support is an experimental way to see whether the same feature files can move beyond ASP.NET later.</span>
+                </p>
+                <p class="sect__lede sect__lede--dim">
+                    <span class="lang-ja">edge は利用者に近い場所でコードを動かす考え方、WASI はサーバー側コードを WebAssembly component として動かす仕組みです。SliceFx.Wasi は、生成されたルートテーブルを使って ASP.NET の外でも portable な機能を dispatch します。</span><span class="lang-en">Edge means running code closer to users. WASI packages server-side code as a WebAssembly component; SliceFx.Wasi uses a generated route table to dispatch portable features outside ASP.NET.</span>
+                </p>
+                <p class="sect__lede">
+                    <span class="lang-ja">ほとんどのプロジェクトは 3 つの移植性クラスを同じコードベースで併用します。分類はツールに「どこで動かせるか」を伝えるもので、コードの良し悪しを表すものではありません。</span><span class="lang-en">Most projects use all three portability classes in the same codebase — the classification tells tooling where a feature can run, not whether it is well-written.</span>
+                </p>
+
+                <div class="cards">
+                    <article class="panel card card--portable">
+                        <h3 class="card__name label">portable</h3>
+                        <p><span class="lang-ja">プレーンな request / response を返す機能。型付きクライアント、WASI dispatch、function-per-feature Lambda の候補になります。</span><span class="lang-en">Plain request / response features. Candidates for typed clients, WASI dispatch, and function-per-feature Lambda.</span></p>
+                    </article>
+                    <article class="panel card card--partial">
+                        <h3 class="card__name label">partial</h3>
+                        <p><span class="lang-ja">ハンドラー形状は移植しやすいが、一部のフィルターなど ASP.NET 固有の振る舞いがあります。</span><span class="lang-en">The handler shape is portable, but some attached behavior such as endpoint filters is ASP.NET-specific today.</span></p>
+                    </article>
+                    <article class="panel card card--aspnet">
+                        <h3 class="card__name label">aspnet-only</h3>
+                        <p><span class="lang-ja"><code>IResult</code> など ASP.NET の機能を意図的に使う機能。悪いコードではなく、ASP.NET に残る判断です。</span><span class="lang-en">Features that intentionally use ASP.NET concepts such as <code>IResult</code>. Not bad code; simply an ASP.NET-specific choice.</span></p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">
