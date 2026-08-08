@@ -23,6 +23,7 @@ jobs:
   wasi-publish:
     name: Publish WasiSample (wasi-wasm)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -44,4 +45,96 @@ jobs:
           fi
           size=$(stat -c %s samples/SliceFx.WasiSample/dist/slice-wasi-sample.wasm)
           echo "WASM component size: $size bytes ($(( size / 1024 / 1024 )) MB)" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      # The steps below gate the Cloudflare deployment path. Asserting that the
+      # .wasm exists says nothing about whether the hand-written host glue in
+      # dist/shim.mjs still matches what jco and preview2-shim expect; both
+      # contracts have drifted silently before, leaving every request at HTTP
+      # 500 with CI green.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: samples/SliceFx.WasiSample/dist/package-lock.json
+
+      - name: Transpile the component for Cloudflare Workers (jco)
+        working-directory: samples/SliceFx.WasiSample/dist
+        run: |
+          npm ci
+          npm run transpile
+
+      - name: Smoke-test the transpiled component on workerd
+        working-directory: samples/SliceFx.WasiSample/dist
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          set -euo pipefail
+
+          npx wrangler dev --config wrangler.deploy.toml --ip 127.0.0.1 --port 8787 \
+            > wrangler-dev.log 2>&1 &
+          worker_pid=$!
+          trap 'kill "$worker_pid" 2>/dev/null || true' EXIT
+
+          ready=
+          for _ in $(seq 1 60); do
+            if ! kill -0 "$worker_pid" 2>/dev/null; then
+              echo "::error::wrangler dev exited before becoming ready."
+              cat wrangler-dev.log
+              exit 1
+            fi
+            # Any HTTP response means the worker is up. Deliberately not -f:
+            # a broken shim answers 500, and that must reach the assertions
+            # below as a clear failure rather than time out as "not ready".
+            if curl -s -o /dev/null http://127.0.0.1:8787/health; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+
+          if [ -z "$ready" ]; then
+            echo "::error::wrangler dev did not respond within 120s."
+            cat wrangler-dev.log
+            exit 1
+          fi
+
+          failures=0
+
+          # assert_route <expected-status> <expected-body-substring> <curl args...>
+          assert_route() {
+            expected_status=$1
+            expected_body=$2
+            shift 2
+
+            response=$(curl -s -w '\n%{http_code}' "$@")
+            status=${response##*$'\n'}
+            body=${response%$'\n'*}
+
+            if [ "$status" != "$expected_status" ]; then
+              echo "::error::$* -> HTTP $status, expected $expected_status. Body: $body"
+              failures=$((failures + 1))
+            elif [ -n "$expected_body" ] && [ "${body#*"$expected_body"}" = "$body" ]; then
+              echo "::error::$* -> body did not contain '$expected_body'. Body: $body"
+              failures=$((failures + 1))
+            else
+              echo "ok: $* -> HTTP $status"
+            fi
+          }
+
+          assert_route 200 '"Status":"ok"' http://127.0.0.1:8787/health
+          assert_route 200 '"Echo":"hello"' -X POST http://127.0.0.1:8787/echo \
+            -H 'Content-Type: application/json' -d '{"message":"hello"}'
+          assert_route 400 'The Message field is required.' -X POST http://127.0.0.1:8787/echo \
+            -H 'Content-Type: application/json' -d '{}'
+          assert_route 404 '"status":404' http://127.0.0.1:8787/nope
+
+          if [ "$failures" -ne 0 ]; then
+            echo "::error::$failures Cloudflare smoke assertion(s) failed."
+            cat wrangler-dev.log
+            exit 1
+          fi
+
+          echo "Cloudflare Workers smoke test: 4/4 routes OK (jco transpile + workerd)" \
             >> "$GITHUB_STEP_SUMMARY"
