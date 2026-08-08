@@ -91,28 +91,47 @@ Expected: `911`
 
 Write this to the scratchpad (not to the repo — it is a working tool, not deliverable infrastructure):
 
+The shell here is **zsh**, which does not word-split unquoted parameters the way bash does. A
+`for pair in "#fff #000"; do check $pair; done` loop passes one argument, not two. The checker
+therefore takes all pairs as flat arguments and loops internally — never wrap it in a shell loop.
+
 ```bash
 cat > /private/tmp/claude-501/-Users-sanosuguru-dev-slicefx/0f10ae0e-06b0-4c13-a654-874879d1f88e/scratchpad/contrast.py <<'PY'
+"""WCAG contrast checker. Usage: contrast.py FG BG [FG BG ...]
+Exits non-zero if any pair falls below 4.5:1."""
 import sys
+
 def lin(c):
     c = c / 255
     return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
 def L(h):
     h = h.lstrip('#')
     r, g, b = (int(h[i:i+2], 16) for i in (0, 2, 4))
     return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+
 def cr(a, b):
     l1, l2 = sorted((L(a), L(b)), reverse=True)
     return (l1 + 0.05) / (l2 + 0.05)
-fg, bg = sys.argv[1], sys.argv[2]
-r = cr(fg, bg)
-print(f"{r:.2f}:1  {'PASS' if r >= 4.5 else 'FAIL'}  {fg} on {bg}")
-sys.exit(0 if r >= 4.5 else 1)
+
+args = sys.argv[1:]
+if len(args) < 2 or len(args) % 2:
+    sys.exit("need an even number of colours: FG BG [FG BG ...]")
+
+worst = 0
+for i in range(0, len(args), 2):
+    fg, bg = args[i], args[i + 1]
+    r = cr(fg, bg)
+    ok = r >= 4.5
+    worst |= not ok
+    print(f"{r:5.2f}:1  {'PASS' if ok else 'FAIL'}  {fg} on {bg}")
+print("== ALL PASS ==" if not worst else "== CONTRAST REGRESSION ==")
+sys.exit(worst)
 PY
 python3 /private/tmp/claude-501/-Users-sanosuguru-dev-slicefx/0f10ae0e-06b0-4c13-a654-874879d1f88e/scratchpad/contrast.py '#ffffff' '#7c3aed'
 ```
 
-Expected: `5.70:1  PASS  #ffffff on #7c3aed`
+Expected: ` 5.70:1  PASS  #ffffff on #7c3aed` then `== ALL PASS ==`
 
 - [ ] **Step 3: Write `docs/assets/site.css`**
 
@@ -217,12 +236,11 @@ html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
 
 ```bash
 cd /private/tmp/claude-501/-Users-sanosuguru-dev-slicefx/0f10ae0e-06b0-4c13-a654-874879d1f88e/scratchpad
-for pair in "#ffffff #7c3aed" "#a78bfa #18181b" "#8b5cf6 #09090b" "#a1a1aa #18181b" "#8b8b94 #18181b" "#f4f4f5 #09090b" "#10b981 #18181b"; do
-  python3 contrast.py $pair || echo "  ^^^ REGRESSION"
-done
+python3 contrast.py '#ffffff' '#7c3aed' '#a78bfa' '#18181b' '#8b5cf6' '#09090b' \
+  '#a1a1aa' '#18181b' '#8b8b94' '#18181b' '#f4f4f5' '#09090b' '#10b981' '#18181b'
 ```
 
-Expected: seven lines, all `PASS`, no `REGRESSION`.
+Expected: seven `PASS` lines then `== ALL PASS ==`.
 
 - [ ] **Step 5: Verify no external references crept in**
 
@@ -944,7 +962,7 @@ Expected: `0`, `1`, `0`.
 
 ```bash
 cd /private/tmp/claude-501/-Users-sanosuguru-dev-slicefx/0f10ae0e-06b0-4c13-a654-874879d1f88e/scratchpad
-for pair in "#10b981 #18181b" "#eab308 #18181b" "#a78bfa #18181b"; do python3 contrast.py $pair; done
+python3 contrast.py '#10b981' '#18181b' '#eab308' '#18181b' '#a78bfa' '#18181b'
 ```
 
 Expected: three `PASS` lines.
@@ -1176,13 +1194,10 @@ Expected: every line `PASS`. Fix any `FAIL` before continuing.
 
 ```bash
 cd /private/tmp/claude-501/-Users-sanosuguru-dev-slicefx/0f10ae0e-06b0-4c13-a654-874879d1f88e/scratchpad
-fail=0
-for pair in "#ffffff #7c3aed" "#f4f4f5 #09090b" "#a1a1aa #09090b" "#a1a1aa #18181b" \
-            "#8b8b94 #18181b" "#8b5cf6 #09090b" "#a78bfa #18181b" "#10b981 #18181b" \
-            "#eab308 #18181b" "#38bdf8 #18181b" "#fca5a5 #09090b"; do
-  python3 contrast.py $pair || fail=1
-done
-[ $fail -eq 0 ] && echo "ALL PASS" || echo "CONTRAST REGRESSION"
+python3 contrast.py \
+  '#ffffff' '#7c3aed'  '#f4f4f5' '#09090b'  '#a1a1aa' '#09090b'  '#a1a1aa' '#18181b' \
+  '#8b8b94' '#18181b'  '#8b5cf6' '#09090b'  '#a78bfa' '#18181b'  '#10b981' '#18181b' \
+  '#eab308' '#18181b'  '#38bdf8' '#18181b'  '#fca5a5' '#09090b'
 ```
 
 Expected: `ALL PASS`.
