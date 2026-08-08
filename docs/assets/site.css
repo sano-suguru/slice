@@ -711,6 +711,85 @@ code[data-kind="command"]::before {
     }
 }
 
+/* ---------- Generic section -------------------------------------------- */
+
+.sect {
+    background: var(--base);
+    padding: 3rem 1.5rem;
+}
+
+.sect__eyebrow {
+    margin-bottom: 0.75rem;
+    color: var(--accent);
+}
+
+.sect__title {
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.sect__title--second {
+    margin-top: 4rem;
+}
+
+.sect__lede {
+    max-width: 44rem;
+    margin-bottom: 2rem;
+    color: var(--fg-mute);
+    font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+    .sect {
+        padding: 5rem 3rem;
+    }
+}
+
+/* ---------- Key/value rows --------------------------------------------- */
+
+.rows {
+    border: 2px solid var(--line);
+    background: var(--surface);
+}
+
+.rows__row {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid var(--line);
+}
+
+.rows__row:last-child {
+    border-bottom: 0;
+}
+
+.rows__key {
+    padding: 1.25rem;
+    font-weight: 700;
+    background: var(--base);
+}
+
+.rows__key--self {
+    color: var(--accent-text);
+}
+
+.rows__val {
+    padding: 1.25rem;
+    color: var(--fg-mute);
+    font-size: 0.95rem;
+}
+
+@media (min-width: 768px) {
+    .rows__row {
+        flex-direction: row;
+    }
+
+    .rows__key {
+        width: 14rem;
+        flex: none;
+        border-right: 2px solid var(--line);
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {

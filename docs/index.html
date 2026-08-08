@@ -261,6 +261,56 @@ slicefx client typescript --output slice-api-client.ts</pre>
             </div>
         </section>
 
+        <!-- ===== Positioning ============================================= -->
+        <section id="positioning" class="band">
+            <div class="wrap sect">
+                <p class="label sect__eyebrow"><span class="lang-ja">SliceFxを選ぶ理由</span><span class="lang-en">Why SliceFx</span></p>
+                <h2 class="h-lg sect__title">
+                    <span class="lang-ja">Minimal API はそのまま、ずれやすい周辺だけを生成</span><span class="lang-en">Standard Minimal APIs, generated around the pieces that drift</span>
+                </h2>
+                <p class="sect__lede">
+                    <span class="lang-ja">SliceFxはASP.NET Coreの上に乗ります。実行時は Minimal API に近く、ずれやすい登録・診断・クライアント生成だけを機能ファイルから補います。</span><span class="lang-en">SliceFx sits on ASP.NET Core. Runtime behavior stays close to Minimal APIs; the generator handles the registration, checks, and clients that tend to drift.</span>
+                </p>
+
+                <div class="rows">
+                    <div class="rows__row">
+                        <div class="rows__key">Minimal APIs</div>
+                        <div class="rows__val"><span class="lang-ja">手書きの柔軟さが魅力です。一方で、ルート文字列、DTO、クライアント、移植性チェックは自分たちで同期し続ける必要があります。</span><span class="lang-en">Great for handwritten flexibility, but route strings, DTOs, clients, and portability checks are yours to keep in sync.</span></div>
+                    </div>
+                    <div class="rows__row">
+                        <div class="rows__key">FastEndpoints</div>
+                        <div class="rows__val"><span class="lang-ja">エンドポイントを機能単位でまとめやすい構成です。SliceFxは独自パイプラインではなく、生成した Minimal API 登録を使う方針です。</span><span class="lang-en">Provides an endpoint-per-feature shape. SliceFx chooses generated Minimal API registration instead of a custom endpoint pipeline.</span></div>
+                    </div>
+                    <div class="rows__row">
+                        <div class="rows__key rows__key--self">SliceFx</div>
+                        <div class="rows__val"><span class="lang-ja">機能のまとまり、<code>SLICE001</code> などのビルド時診断、<code data-kind="command">slicefx routes</code>、<code data-kind="command">slicefx client csharp</code>、<code data-kind="command">slicefx openapi</code> を同じメタデータでつなぎます。</span><span class="lang-en">Uses the same metadata for feature locality, build-time diagnostics such as <code>SLICE001</code>, <code data-kind="command">slicefx routes</code>, <code data-kind="command">slicefx client csharp</code>, and <code data-kind="command">slicefx openapi</code>.</span></div>
+                    </div>
+                </div>
+
+                <h3 class="h-lg sect__title sect__title--second">
+                    <span class="lang-ja">どんなチームに向いている？</span><span class="lang-en">Who is SliceFx for?</span>
+                </h3>
+                <p class="sect__lede">
+                    <span class="lang-ja">API 層は軽く保ちたい。でもルート、クライアント、将来の実行環境をばらばらに管理したくない。そんな個人やチームに向いています。</span><span class="lang-en">For individual developers and teams that want a light API layer without letting routes, clients, and future runtime choices drift apart.</span>
+                </p>
+
+                <div class="rows">
+                    <div class="rows__row">
+                        <div class="rows__key"><span class="lang-ja">小さなAPIチーム</span><span class="lang-en">Small API teams</span></div>
+                        <div class="rows__val"><span class="lang-ja">1エンドポイントを1ファイルで管理できます。リクエスト、レスポンス、バリデーション、ハンドラーがまとまるので、担当範囲も見えやすくなります。</span><span class="lang-en">One endpoint is one file. Request, response, validation, and handler stay together, so feature ownership stays visible.</span></div>
+                    </div>
+                    <div class="rows__row">
+                        <div class="rows__key"><span class="lang-ja">Blazor/.NETクライアント</span><span class="lang-en">Blazor/.NET clients</span></div>
+                        <div class="rows__val"><span class="lang-ja">サーバー側の機能定義から型付き HttpClient を生成し、ルート文字列やDTOを手で合わせ続ける手間を減らします。</span><span class="lang-en">Generate typed HttpClient wrappers from server features and avoid hand-maintained route strings and DTO wiring.</span></div>
+                    </div>
+                    <div class="rows__row">
+                        <div class="rows__key"><span class="lang-ja">Serverless/AOT も視野に入れるチーム</span><span class="lang-en">Serverless/AOT-minded teams</span></div>
+                        <div class="rows__val"><span class="lang-ja"><code data-kind="command">slicefx routes</code> で移植性を早めに確認しながら、普段は ASP.NET Core を主な実行環境として使い続けられます。</span><span class="lang-en"><code data-kind="command">slicefx routes</code> surfaces portability early while ASP.NET Core remains the primary runtime.</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">
