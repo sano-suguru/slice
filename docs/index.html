@@ -483,6 +483,43 @@ slicefx openapi --output openapi.json</pre>
             </div>
         </section>
 
+        <!-- ===== Packages ================================================ -->
+        <section id="packages" class="band">
+            <div class="wrap sect">
+                <h2 class="h-lg sect__title"><span class="lang-ja">コアは小さく、必要なアダプタだけを追加</span><span class="lang-en">Small core, optional adapters</span></h2>
+                <p class="sect__lede">
+                    <span class="lang-ja">ホスティングやテストに必要な依存関係は、用途ごとのサテライトパッケージに分けています。すべてのパッケージは NuGet で公開されています。</span><span class="lang-en">Hosting and testing dependencies stay in satellite packages. All packages are available on NuGet.</span>
+                </p>
+
+                <div class="pkgs">
+                    <a class="panel pkg" href="https://www.nuget.org/packages/SliceFx.Core">
+                        <h3 class="pkg__name">SliceFx.Core</h3>
+                        <p><span class="lang-ja">属性、バリデーションフィルター、エンドポイントフィルターを含むコアランタイムです。</span><span class="lang-en">Core runtime: attributes, validation filters, and endpoint filters.</span></p>
+                    </a>
+                    <a class="panel pkg" href="https://www.nuget.org/packages/SliceFx.SourceGenerator">
+                        <h3 class="pkg__name">SliceFx.SourceGenerator</h3>
+                        <p><span class="lang-ja">機能ルートの登録コードを、AOT に適した形で生成します。</span><span class="lang-en">AOT-friendly generated registrations for feature routes.</span></p>
+                    </a>
+                    <a class="panel pkg" href="https://www.nuget.org/packages/SliceFx.Lambda">
+                        <h3 class="pkg__name">SliceFx.Lambda</h3>
+                        <p><span class="lang-ja">ASP.NET Core 上で AWS Lambda ホスティングを使うための連携パッケージです。</span><span class="lang-en">AWS Lambda hosting integration over ASP.NET Core.</span></p>
+                    </a>
+                    <a class="panel pkg" href="https://www.nuget.org/packages/SliceFx.Wasi">
+                        <h3 class="pkg__name">SliceFx.Wasi</h3>
+                        <p><span class="lang-ja">Cloudflare Workers や Fermyon Spin などの wasi:http ホスト向けに、ASP.NET に依存しない実験的なディスパッチを提供します。</span><span class="lang-en">Experimental ASP.NET-independent dispatch for wasi:http hosts such as Cloudflare Workers and Fermyon Spin.</span></p>
+                    </a>
+                    <a class="panel pkg" href="https://www.nuget.org/packages/SliceFx.TestHost">
+                        <h3 class="pkg__name">SliceFx.TestHost</h3>
+                        <p><span class="lang-ja">SliceFx アプリをインプロセスで HTTP テストするためのヘルパーです。</span><span class="lang-en">In-process HTTP testing helpers for SliceFx apps.</span></p>
+                    </a>
+                    <a class="panel pkg" href="https://www.nuget.org/packages/SliceFx.Cli">
+                        <h3 class="pkg__name">SliceFx.Cli</h3>
+                        <p><span class="lang-ja"><code data-kind="command">slicefx</code> コマンドで、スキャフォールディング、ルート確認、互換性レポート、型付きクライアント生成、OpenAPI projection を実行できます。</span><span class="lang-en">Scaffolding, route inspection, compatibility reports, typed client generation, and OpenAPI projections through the <code data-kind="command">slicefx</code> command.</span></p>
+                    </a>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="site-footer">

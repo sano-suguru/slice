@@ -944,6 +944,40 @@ code[data-kind="command"]::before {
     }
 }
 
+/* ---------- Packages --------------------------------------------------- */
+
+.pkgs {
+    display: grid;
+    gap: 1rem;
+}
+
+.pkg {
+    display: block;
+    padding: 1.5rem;
+    text-decoration: none;
+}
+
+.pkg:hover {
+    border-color: var(--accent);
+}
+
+.pkg__name {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.pkg p {
+    color: var(--fg-mute);
+    font-size: 0.9rem;
+}
+
+@media (min-width: 640px) {
+    .pkgs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* ---------- Copy status ------------------------------------------------ */
 
 .copy-status {
