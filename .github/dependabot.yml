@@ -23,7 +23,12 @@ updates:
     schedule:
       interval: weekly
 
-  # WASI sample: jco / preview2-shim / wrangler (upstream unstable toolchain — review bumps carefully)
+  # WASI sample: jco / preview2-shim / wrangler (upstream unstable toolchain — review bumps carefully).
+  # `npm audit` here reports a standing critical (decompress Zip Slip) that no bump clears:
+  # jco -> componentize-js -> weval -> decompress, and weval still depends on decompress at its
+  # latest version, so audit's only "fix" is downgrading jco by nine minors. It is build-time
+  # tooling for componentizing JS, a path this repo never takes — we transpile a .NET-produced
+  # wasm. Leave it until weval drops decompress upstream; do not downgrade jco to silence it.
   - package-ecosystem: npm
     directory: /samples/SliceFx.WasiSample/dist
     schedule:
