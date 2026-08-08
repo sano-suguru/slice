@@ -239,10 +239,20 @@ code[data-kind="command"]::before {
     color: var(--fg-mute);
 }
 
+/* The filename is one unbreakable token; without min-width:0 it refuses to
+   shrink and pushes the chip past the viewport at narrow widths. */
+.code__bar > :first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .code__chip {
     flex: none;
     border: 1px solid var(--line);
     padding: 0.15rem 0.5rem;
+    white-space: nowrap;
 }
 
 .code pre {
@@ -393,7 +403,9 @@ code[data-kind="command"]::before {
     white-space: nowrap;
 }
 
-@media (max-width: 767px) {
+/* The brand + chip + five links + select + GitHub do not fit at 768px --
+   they collide. The desktop row only earns its place from 1024px up. */
+@media (max-width: 1023px) {
     .nav {
         --nav-h: 3.5rem;
     }
@@ -406,7 +418,12 @@ code[data-kind="command"]::before {
         display: flex;
     }
 
-    .nav__chip,
+    .nav__chip {
+        display: none;
+    }
+}
+
+@media (max-width: 479px) {
     .nav__gh-text {
         display: none;
     }
@@ -1167,7 +1184,8 @@ html {
     scroll-margin-top: var(--nav-h);
 }
 
-@media (max-width: 767px) {
+/* Same breakpoint as the nav above: below 1024px the nav is two rows tall. */
+@media (max-width: 1023px) {
     html {
         scroll-padding-top: 8rem;
     }

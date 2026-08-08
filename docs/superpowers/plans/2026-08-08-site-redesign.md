@@ -1221,7 +1221,11 @@ With the server from Task 3 running at `http://localhost:8765/`:
 1. Toggle EN → JA → EN. Confirm no layout break and that `<html lang>` follows.
 2. Reload. Confirm the language persisted.
 3. Click the copy button. Confirm the status text appears and clears after 3s.
-4. **Disable JavaScript and reload.** Confirm the page renders fully styled and that *both* languages are visible (the CSS toggle is inert without the `data-lang` attribute being changed, so English shows by default from the markup). Confirm no layout collapse.
+4. **Disable JavaScript and reload.** The markup pins `data-lang="en"`, so English renders
+   and Japanese stays in the DOM but hidden by CSS — both languages reach crawlers, one
+   reaches the reader, and only the selector stops working. Confirm the page is fully styled
+   with no layout collapse, and that the raw HTML carries equal counts of `lang-ja` and
+   `lang-en` spans.
 5. Resize to 320, 768, 1280 px. Confirm no horizontal body scroll at any width, and that code blocks scroll within their own box.
 6. Tab through the page from the top. Confirm the skip link appears first, the focus ring is visible on every control, and `<pre>` blocks receive focus.
 7. Confirm the browser console is empty.
