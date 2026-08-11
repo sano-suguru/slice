@@ -232,7 +232,7 @@
                         <p class="stagger__num label">01. <span class="lang-ja">局所性</span><span class="lang-en">Locality of behavior</span></p>
                         <h3 class="h-md stagger__title"><span class="lang-ja">機能単位で構成</span><span class="lang-en">Feature-shaped APIs</span></h3>
                         <p class="stagger__body">
-                            <span class="lang-ja">1つの静的クラスが1つのエンドポイント。リクエスト、レスポンス、ハンドラー、バリデーションを同じ場所で確認できます。</span><span class="lang-en">One static class maps to one endpoint, keeping request, response, handler, and validation close together.</span>
+                            <span class="lang-ja">1つの静的クラスが1つのエンドポイント。リクエスト、レスポンス、ハンドラー、バリデーションを同じ場所で確認できます。</span><span class="lang-en">One static class maps to one endpoint. Request, response, handler, and validation stay close together.</span>
                         </p>
                     </article>
 
@@ -240,7 +240,7 @@
                         <p class="stagger__num label">02. <span class="lang-ja">契約の生成</span><span class="lang-en">Contract generation</span></p>
                         <h3 class="h-md stagger__title"><span class="lang-ja">API契約がずれにくい</span><span class="lang-en">API contracts stay aligned</span></h3>
                         <p class="stagger__body">
-                            <span class="lang-ja">ルートメタデータ、互換性レポート、型付きクライアント、OpenAPI projection を、同じ機能ファイルから生成します。</span><span class="lang-en">Route metadata, compatibility reports, typed clients, and OpenAPI projections are generated from the same feature files.</span>
+                            <span class="lang-ja">ルートメタデータ、互換性レポート、型付きクライアント、OpenAPI projection を同じ機能ファイルから生成します。</span><span class="lang-en">The same feature files generate route metadata, compatibility reports, typed clients, and OpenAPI projections.</span>
                         </p>
                         <div class="code">
 <pre tabindex="0"><span class="token comment"># <span class="lang-ja">同じマニフェストから型付きクライアントを生成</span><span class="lang-en">Typed clients from the same manifest</span></span>
@@ -253,13 +253,13 @@ slicefx client typescript --output slice-api-client.ts</pre>
                         <p class="stagger__num label">03. <span class="lang-ja">土台</span><span class="lang-en">Foundation</span></p>
                         <h3 class="h-md stagger__title"><span class="lang-ja">ASP.NET Core から離れない</span><span class="lang-en">Still ASP.NET Core</span></h3>
                         <p class="stagger__body">
-                            <span class="lang-ja">Minimal API のバインディング、DI、エンドポイントフィルター、DataAnnotations をそのまま利用できます。必要な場面では ASP.NET 固有の <code>IResult</code> も使えます。</span><span class="lang-en">Keep Minimal API binding, DI, endpoint filters, and DataAnnotations; use ASP.NET-specific <code>IResult</code> when a slice needs it.</span>
+                            <span class="lang-ja">Minimal API のバインディング、DI、エンドポイントフィルター、DataAnnotations をそのまま利用できます。必要な場面では ASP.NET 固有の <code>IResult</code> も使えます。</span><span class="lang-en">Keep Minimal API binding, DI, endpoint filters, and DataAnnotations. Use ASP.NET-specific <code>IResult</code> when a slice needs it.</span>
                         </p>
                     </article>
 
                     <p class="stagger stagger__note">
                         <span class="lang-ja">SliceFx は ASP.NET の機能を制限しません。認可・レート制限・キャッシュ・CORS・カスタム検証はそのまま使えます。<a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET 機能とエスケープハッチ →</a></span>
-                        <span class="lang-en">SliceFx doesn't restrict any ASP.NET feature — authorization, rate limiting, caching, CORS, and custom validation all stay available. <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET features and escape hatches →</a></span>
+                        <span class="lang-en">SliceFx doesn't restrict any ASP.NET feature. Authorization, rate limiting, caching, CORS, and custom validation all stay available. <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">ASP.NET features and escape hatches →</a></span>
                     </p>
                 </div>
             </div>
@@ -273,7 +273,7 @@ slicefx client typescript --output slice-api-client.ts</pre>
                     <span class="lang-ja">Minimal API はそのまま、ずれやすい周辺だけを生成</span><span class="lang-en">Standard Minimal APIs, generated around the pieces that drift</span>
                 </h2>
                 <p class="sect__lede">
-                    <span class="lang-ja">SliceFxはASP.NET Coreの上に乗ります。実行時は Minimal API に近く、ずれやすい登録・診断・クライアント生成だけを機能ファイルから補います。</span><span class="lang-en">SliceFx sits on ASP.NET Core. Runtime behavior stays close to Minimal APIs; the generator handles the registration, checks, and clients that tend to drift.</span>
+                    <span class="lang-ja">SliceFx は ASP.NET Core の上に乗ります。実行時は Minimal API に近く、ずれやすい登録・診断・クライアント生成だけを機能ファイルから補います。</span><span class="lang-en">SliceFx sits on ASP.NET Core. Runtime behavior stays close to Minimal APIs. The generator handles the registration, checks, and clients that tend to drift.</span>
                 </p>
 
                 <div class="rows">
@@ -283,11 +283,11 @@ slicefx client typescript --output slice-api-client.ts</pre>
                     </div>
                     <div class="rows__row">
                         <div class="rows__key">FastEndpoints</div>
-                        <div class="rows__val"><span class="lang-ja">エンドポイントを機能単位でまとめやすい構成です。SliceFxは独自パイプラインではなく、生成した Minimal API 登録を使う方針です。</span><span class="lang-en">Provides an endpoint-per-feature shape. SliceFx chooses generated Minimal API registration instead of a custom endpoint pipeline.</span></div>
+                        <div class="rows__val"><span class="lang-ja">エンドポイントを機能単位でまとめやすい構成です。SliceFx は独自パイプラインではなく、生成した Minimal API 登録を使う方針です。</span><span class="lang-en">Provides an endpoint-per-feature shape. SliceFx chooses generated Minimal API registration instead of a custom endpoint pipeline.</span></div>
                     </div>
                     <div class="rows__row">
                         <div class="rows__key rows__key--self">SliceFx</div>
-                        <div class="rows__val"><span class="lang-ja">機能のまとまり、<code>SLICE001</code> などのビルド時診断、<code data-kind="command">slicefx routes</code>、<code data-kind="command">slicefx client csharp</code>、<code data-kind="command">slicefx openapi</code> を同じメタデータでつなぎます。</span><span class="lang-en">Uses the same metadata for feature locality, build-time diagnostics such as <code>SLICE001</code>, <code data-kind="command">slicefx routes</code>, <code data-kind="command">slicefx client csharp</code>, and <code data-kind="command">slicefx openapi</code>.</span></div>
+                        <div class="rows__val"><span class="lang-ja">機能のまとまりと、<code>SLICE001</code> などのビルド時診断を同じメタデータでつなぎます。<code data-kind="command">slicefx routes</code>、<code data-kind="command">slicefx client csharp</code>、<code data-kind="command">slicefx openapi</code> もこのメタデータを読みます。</span><span class="lang-en">One set of metadata connects feature locality and build-time diagnostics such as <code>SLICE001</code>. <code data-kind="command">slicefx routes</code>, <code data-kind="command">slicefx client csharp</code>, and <code data-kind="command">slicefx openapi</code> read the same metadata.</span></div>
                     </div>
                 </div>
 
@@ -300,12 +300,12 @@ slicefx client typescript --output slice-api-client.ts</pre>
 
                 <div class="rows">
                     <div class="rows__row">
-                        <div class="rows__key"><span class="lang-ja">小さなAPIチーム</span><span class="lang-en">Small API teams</span></div>
+                        <div class="rows__key"><span class="lang-ja">小さな API チーム</span><span class="lang-en">Small API teams</span></div>
                         <div class="rows__val"><span class="lang-ja">1エンドポイントを1ファイルで管理できます。リクエスト、レスポンス、バリデーション、ハンドラーがまとまるので、担当範囲も見えやすくなります。</span><span class="lang-en">One endpoint is one file. Request, response, validation, and handler stay together, so feature ownership stays visible.</span></div>
                     </div>
                     <div class="rows__row">
-                        <div class="rows__key"><span class="lang-ja">Blazor/.NETクライアント</span><span class="lang-en">Blazor/.NET clients</span></div>
-                        <div class="rows__val"><span class="lang-ja">サーバー側の機能定義から型付き HttpClient を生成し、ルート文字列やDTOを手で合わせ続ける手間を減らします。</span><span class="lang-en">Generate typed HttpClient wrappers from server features and avoid hand-maintained route strings and DTO wiring.</span></div>
+                        <div class="rows__key"><span class="lang-ja">Blazor / .NET クライアント</span><span class="lang-en">Blazor/.NET clients</span></div>
+                        <div class="rows__val"><span class="lang-ja">サーバー側の機能定義から型付き HttpClient を生成し、ルート文字列や DTO を手で合わせ続ける手間を減らします。</span><span class="lang-en">Generate typed HttpClient wrappers from server features and avoid hand-maintained route strings and DTO wiring.</span></div>
                     </div>
                     <div class="rows__row">
                         <div class="rows__key"><span class="lang-ja">Serverless/AOT も視野に入れるチーム</span><span class="lang-en">Serverless/AOT-minded teams</span></div>
@@ -324,11 +324,11 @@ slicefx client typescript --output slice-api-client.ts</pre>
                     <div class="strengths">
                         <article class="strength">
                             <h3 class="strength__title"><span class="lang-ja">Core は NuGet 依存ゼロ</span><span class="lang-en">Zero-dependency core</span></h3>
-                            <p><span class="lang-ja">コアランタイムが依存するのは <code>Microsoft.AspNetCore.App</code> だけです。FluentValidation や MediatR を前提にせず、必要なアダプタだけを後から追加できます。</span><span class="lang-en">The core runtime only depends on <code>Microsoft.AspNetCore.App</code>. FluentValidation and MediatR are not required; optional adapters can be added later.</span></p>
+                            <p><span class="lang-ja">コアランタイムが依存するのは <code>Microsoft.AspNetCore.App</code> だけです。FluentValidation や MediatR を前提にせず、必要なアダプタだけを後から追加できます。</span><span class="lang-en">The core runtime only depends on <code>Microsoft.AspNetCore.App</code>. FluentValidation and MediatR are not required. Optional adapters can be added later.</span></p>
                         </article>
                         <article class="strength">
                             <h3 class="strength__title"><span class="lang-ja">生成された登録コード</span><span class="lang-en">Generated registrations</span></h3>
-                            <p><span class="lang-ja"><code>AddSlice()</code> と <code>MapSlices()</code> はソースジェネレータが出力します。登録経路を1つに絞り、無効な機能定義は <code>SLICE###</code> 診断としてビルド時に出します。</span><span class="lang-en"><code>AddSlice()</code> and <code>MapSlices()</code> are emitted by the source generator. Invalid feature shapes become <code>SLICE###</code> diagnostics at build time.</span></p>
+                            <p><span class="lang-ja"><code>AddSlice()</code> と <code>MapSlices()</code> はソースジェネレータが出力します。登録経路を1つに絞り、無効な機能定義は <code>SLICE###</code> 診断としてビルド時に出します。</span><span class="lang-en">The source generator emits <code>AddSlice()</code> and <code>MapSlices()</code>. Invalid feature shapes become <code>SLICE###</code> diagnostics at build time.</span></p>
                         </article>
                         <article class="strength">
                             <h3 class="strength__title"><span class="lang-ja">Native AOT を意識した起動経路</span><span class="lang-en">Native AOT-minded startup path</span></h3>
@@ -340,11 +340,11 @@ slicefx client typescript --output slice-api-client.ts</pre>
                         </article>
                         <article class="strength">
                             <h3 class="strength__title"><span class="lang-ja">ルートマニフェスト</span><span class="lang-en">Route-manifest tooling</span></h3>
-                            <p><span class="lang-ja">ルートマニフェストをもとに、<code data-kind="command">slicefx routes</code>、<code data-kind="command">slicefx client csharp</code>、<code data-kind="command">slicefx client typescript</code>、<code data-kind="command">slicefx openapi</code> が同じ定義を使います。</span><span class="lang-en">The route manifest powers <code data-kind="command">slicefx routes</code>, <code data-kind="command">slicefx client csharp</code>, <code data-kind="command">slicefx client typescript</code>, and <code data-kind="command">slicefx openapi</code> from the same definitions.</span></p>
+                            <p><span class="lang-ja">ルートマニフェストは 4 つの CLI コマンドが共有します。<code data-kind="command">slicefx routes</code>、<code data-kind="command">slicefx client csharp</code>、<code data-kind="command">slicefx client typescript</code>、<code data-kind="command">slicefx openapi</code> です。</span><span class="lang-en">Four CLI commands share the route manifest: <code data-kind="command">slicefx routes</code>, <code data-kind="command">slicefx client csharp</code>, <code data-kind="command">slicefx client typescript</code>, and <code data-kind="command">slicefx openapi</code>.</span></p>
                         </article>
                         <article class="strength">
                             <h3 class="strength__title"><span class="lang-ja">ロックインが小さい</span><span class="lang-en">Low lock-in</span></h3>
-                            <p><span class="lang-ja">ジェネレータが出力するのは標準の <code>MapMethods</code> 呼び出しです。ジェネレータ参照を外して生成コードをその場で展開すれば、フレームワーク残留物の少ない離脱経路になります。</span><span class="lang-en">The generator emits standard <code>MapMethods</code> calls. Remove the source generator reference and expand the generated output in place for a low-residue exit path.</span></p>
+                            <p><span class="lang-ja">ジェネレータが出力するのは標準の <code>MapMethods</code> 呼び出しです。ジェネレータ参照を外して生成コードをその場に展開すれば、フレームワーク由来のコードをほとんど残さずに離脱できます。</span><span class="lang-en">The generator emits standard <code>MapMethods</code> calls. Remove the source generator reference and expand the generated output in place. Almost no framework-specific code is left behind.</span></p>
                         </article>
                         <article class="strength">
                             <h3 class="strength__title"><span class="lang-ja">ASP.NET の機能はそのまま</span><span class="lang-en">Full ASP.NET surface</span></h3>
@@ -448,7 +448,7 @@ slicefx openapi --output openapi.json</pre>
 
                 <div class="note">
                     <p class="note__head"><span class="lang-ja">ポータビリティのヒント: <code>[FromServices]</code></span><span class="lang-en">Portability tip: <code>[FromServices]</code></span></p>
-                    <p><span class="lang-ja">ASP.NET パスのバインディングは生の Minimal API と同一で、登録済みサービス(具象・インターフェイス問わず)は <code>[FromServices]</code> なしで DI 解決されます。WASI / Lambda にもポータブルにしたい場合は、具象クラスの DI サービスに <code>[FromServices]</code>、キー付きサービスに <code>[FromKeyedServices(key)]</code> を付けてください。<a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/parameter-binding.md">パラメータバインディングの詳細 →</a></span><span class="lang-en">On the ASP.NET path binding is plain Minimal API — any registered service (concrete or interface) resolves from DI automatically. Annotate concrete services with <code>[FromServices]</code> (keyed: <code>[FromKeyedServices(key)]</code>) only to keep handlers portable across WASI and Lambda, where the generator uses a compile-time heuristic. <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/parameter-binding.md">Parameter binding details →</a></span></p>
+                    <p><span class="lang-ja">ASP.NET パスのバインディングは生の Minimal API と同じです。登録済みサービスは、具象クラスとインターフェイスのどちらも、<code>[FromServices]</code> なしで DI から解決されます。WASI / Lambda にも移植したい場合は、バインド元を明示してください。具象クラスのサービスに <code>[FromServices]</code>、キー付きサービスに <code>[FromKeyedServices(key)]</code> を付けます。<a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/parameter-binding.md">パラメータバインディングの詳細 →</a></span><span class="lang-en">On the ASP.NET path, binding is plain Minimal API: any registered service, concrete or interface, resolves from DI automatically. To keep handlers portable across WASI and Lambda, annotate concrete services with <code>[FromServices]</code> and keyed services with <code>[FromKeyedServices(key)]</code>. On those paths the generator uses a compile-time heuristic. <a href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/parameter-binding.md">Parameter binding details →</a></span></p>
                 </div>
             </div>
         </section>
@@ -464,10 +464,10 @@ slicefx openapi --output openapi.json</pre>
                     <span class="lang-ja">SliceFx の既定は普通の ASP.NET Core アプリです。WASI / edge は、同じ機能ファイルを将来 ASP.NET 以外にも持っていけるかを確認するための実験的な選択肢です。</span><span class="lang-en">SliceFx defaults to a normal ASP.NET Core app. WASI / edge support is an experimental way to see whether the same feature files can move beyond ASP.NET later.</span>
                 </p>
                 <p class="sect__lede sect__lede--dim">
-                    <span class="lang-ja">edge は利用者に近い場所でコードを動かす考え方、WASI はサーバー側コードを WebAssembly component として動かす仕組みです。SliceFx.Wasi は、生成されたルートテーブルを使って ASP.NET の外でも portable な機能を dispatch します。</span><span class="lang-en">Edge means running code closer to users. WASI packages server-side code as a WebAssembly component; SliceFx.Wasi uses a generated route table to dispatch portable features outside ASP.NET.</span>
+                    <span class="lang-ja">edge は、利用者に近い場所でコードを動かす考え方です。WASI は、サーバー側コードを WebAssembly component として動かす仕組みです。SliceFx.Wasi は生成されたルートテーブルを使い、ASP.NET の外でも portable な機能を dispatch します。</span><span class="lang-en">Edge means running code closer to users. WASI packages server-side code as a WebAssembly component. SliceFx.Wasi uses a generated route table to dispatch portable features outside ASP.NET.</span>
                 </p>
                 <p class="sect__lede">
-                    <span class="lang-ja">ほとんどのプロジェクトは 3 つの移植性クラスを同じコードベースで併用します。分類はツールに「どこで動かせるか」を伝えるもので、コードの良し悪しを表すものではありません。</span><span class="lang-en">Most projects use all three portability classes in the same codebase — the classification tells tooling where a feature can run, not whether it is well-written.</span>
+                    <span class="lang-ja">ほとんどのプロジェクトは 3 つの移植性クラスを同じコードベースで併用します。分類はツールに「どこで動かせるか」を伝えるもので、コードの良し悪しを表すものではありません。</span><span class="lang-en">Most projects use all three portability classes in the same codebase. The classification tells tooling where a feature can run, not whether it is well-written.</span>
                 </p>
 
                 <div class="cards">
@@ -477,11 +477,11 @@ slicefx openapi --output openapi.json</pre>
                     </article>
                     <article class="panel card card--partial">
                         <h3 class="card__name label">partial</h3>
-                        <p><span class="lang-ja">ハンドラー形状は移植しやすいが、一部のフィルターなど ASP.NET 固有の振る舞いがあります。</span><span class="lang-en">The handler shape is portable, but some attached behavior such as endpoint filters is ASP.NET-specific today.</span></p>
+                        <p><span class="lang-ja">ハンドラー形状は移植できますが、一部のフィルターなど、付随する振る舞いは ASP.NET 固有です。</span><span class="lang-en">The handler shape is portable, but some attached behavior such as endpoint filters is ASP.NET-specific today.</span></p>
                     </article>
                     <article class="panel card card--aspnet">
                         <h3 class="card__name label">aspnet-only</h3>
-                        <p><span class="lang-ja"><code>IResult</code> など ASP.NET の機能を意図的に使う機能。悪いコードではなく、ASP.NET に残る判断です。</span><span class="lang-en">Features that intentionally use ASP.NET concepts such as <code>IResult</code>. Not bad code; simply an ASP.NET-specific choice.</span></p>
+                        <p><span class="lang-ja"><code>IResult</code> など ASP.NET 固有の仕組みを意図的に使う機能です。悪いコードではなく、ASP.NET に残すという判断です。</span><span class="lang-en">Features that intentionally use ASP.NET concepts such as <code>IResult</code>. Not bad code, just an ASP.NET-specific choice.</span></p>
                     </article>
                 </div>
             </div>
@@ -544,7 +544,7 @@ slicefx openapi --output openapi.json</pre>
                     <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/source-generator.md">
                         <p class="label doc__num">02</p>
                         <h3 class="doc__title"><span class="lang-ja">ソースジェネレータ</span><span class="lang-en">Source generator</span></h3>
-                        <p class="doc__body"><span class="lang-ja">機能定義、移植性、検証、移行時の重複をカバーする SLICE 診断、ルートマニフェストのスキーマ、インクリメンタルキャッシュの仕組み。</span><span class="lang-en">SLICE diagnostics for feature shape, portability, validation, and migration overlap, plus the route manifest schema and incremental cache shape.</span></p>
+                        <p class="doc__body"><span class="lang-ja">SLICE 診断（機能定義、移植性、検証、移行時の重複をカバー）、ルートマニフェストのスキーマ、インクリメンタルキャッシュの仕組み。</span><span class="lang-en">SLICE diagnostics (feature shape, portability, validation, migration overlap), the route manifest schema, and the incremental cache shape.</span></p>
                         <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
                     </a>
 
@@ -561,28 +561,28 @@ slicefx openapi --output openapi.json</pre>
                     <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/guides/aspnet-features.md">
                         <p class="label doc__num">04</p>
                         <h3 class="doc__title"><span class="lang-ja">ASP.NET 機能と逃げ道</span><span class="lang-en">ASP.NET features and escape hatches</span></h3>
-                        <p class="doc__body"><span class="lang-ja">SliceFx では何が使えるか。認可・レート制限・CORS・キャッシュ・検証の拡張パス、そして ASP.NET / WASI / Lambda 間でハンドラをポータブルに保つためのバインディング規則。</span><span class="lang-en">What you keep: Authorization, rate limiting, CORS, caching, custom validation with <code>ISliceValidator&lt;T&gt;</code>, and how binding rules differ between ASP.NET (plain Minimal API) and portable targets (WASI / Lambda).</span></p>
+                        <p class="doc__body"><span class="lang-ja">SliceFx では何が使えるか。認可・レート制限・CORS・キャッシュ・検証の拡張パス、そして ASP.NET / WASI / Lambda 間でハンドラをポータブルに保つためのバインディング規則。</span><span class="lang-en">What you keep: authorization, rate limiting, CORS, caching, and custom validation with <code>ISliceValidator&lt;T&gt;</code>. Also how binding rules differ between ASP.NET (plain Minimal API) and portable targets (WASI / Lambda).</span></p>
                         <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
                     </a>
 
                     <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/aot.md">
                         <p class="label doc__num">05</p>
                         <h3 class="doc__title"><span class="lang-ja">NativeAOT デプロイ</span><span class="lang-en">NativeAOT deployment</span></h3>
-                        <p class="doc__body"><span class="lang-ja"><code>[assembly: SliceAspNetAot]</code> で AOT-safe 生成モードに切替。JIT なし・起動数 ms のネイティブバイナリへ発行、distroless コンテナに収める手順。</span><span class="lang-en">Opt in with <code>[assembly: SliceAspNetAot]</code> for reflection-free generated dispatch. Publish a native binary — no JIT, millisecond cold start — and drop it in a distroless container image.</span></p>
+                        <p class="doc__body"><span class="lang-ja"><code>[assembly: SliceAspNetAot]</code> を付けると、AOT-safe な生成モードに切り替わります。JIT なしで数 ms で起動するネイティブバイナリを発行し、distroless コンテナに収める手順です。</span><span class="lang-en">Opt in with <code>[assembly: SliceAspNetAot]</code> for reflection-free generated dispatch. Publish a native binary with no JIT and a millisecond cold start, then drop it in a distroless container image.</span></p>
                         <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
                     </a>
 
                     <a class="panel doc" href="https://github.com/sano-suguru/slicefx/blob/main/docs/production-readiness.md">
                         <p class="label doc__num">06</p>
                         <h3 class="doc__title"><span class="lang-ja">プロダクション準備基準</span><span class="lang-en">Production readiness targets</span></h3>
-                        <p class="doc__body"><span class="lang-ja">まだ達成済みの主張ではありません。6 つの強み保全インバリアント、ベンチマーク基準値、perf ゲート、採用マトリクスをまとめています。</span><span class="lang-en">Targets, not a completed claim: strength-preservation invariants, benchmark baselines, perf gates, and the adoption matrix.</span></p>
+                        <p class="doc__body"><span class="lang-ja">達成済みの主張ではなく、目標です。強みを保つための 6 つのインバリアント、ベンチマーク基準値、perf ゲート、採用マトリクスをまとめています。</span><span class="lang-en">Targets, not a completed claim: the invariants that preserve SliceFx's strengths, benchmark baselines, perf gates, and the adoption matrix.</span></p>
                         <p class="doc__cta label"><span class="lang-ja">GitHub で読む</span><span class="lang-en">Read on GitHub</span></p>
                     </a>
 
                     <a class="panel doc" href="perf/latest.svg">
                         <p class="label doc__num">07</p>
                         <h3 class="doc__title"><span class="lang-ja">最新ベンチ結果</span><span class="lang-en">Latest benchmark chart</span></h3>
-                        <p class="doc__body"><span class="lang-ja">毎晩の GitHub Actions perf 実行から生成される、ソースジェネレータの ColdRun / WarmRun_NoOpEdit SVG チャート。</span><span class="lang-en">An SVG chart generated from the nightly GitHub Actions perf run for source-generator ColdRun and WarmRun_NoOpEdit timings.</span></p>
+                        <p class="doc__body"><span class="lang-ja">ソースジェネレータの ColdRun / WarmRun_NoOpEdit を計測した SVG チャート。毎晩の GitHub Actions perf 実行から生成します。</span><span class="lang-en">An SVG chart of source-generator ColdRun and WarmRun_NoOpEdit timings, generated from the nightly GitHub Actions perf run.</span></p>
                         <p class="doc__cta label"><span class="lang-ja">SVG を開く</span><span class="lang-en">Open SVG</span></p>
                     </a>
                 </div>
@@ -607,7 +607,7 @@ slicefx openapi --output openapi.json</pre>
                     <span class="lang-ja">SliceFx Framework - 実験的な .NET API フレームワーク</span><span class="lang-en">SliceFx Framework - An experimental .NET API framework.</span>
                 </p>
                 <p class="foot__desc">
-                    <span class="lang-ja">MITライセンスで公開しています。</span><span class="lang-en">Released under the MIT License.</span>
+                    <span class="lang-ja">MIT ライセンスで公開しています。</span><span class="lang-en">Released under the MIT License.</span>
                 </p>
             </div>
 
