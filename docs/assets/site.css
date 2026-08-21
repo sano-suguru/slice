@@ -438,11 +438,11 @@ code[data-kind="command"]::before {
 }
 
 .hero__copy {
-    padding: 3rem 1.5rem;
+    padding: 3.5rem 1.5rem;
 }
 
 .hero__title {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
     text-transform: uppercase;
 }
 
@@ -452,7 +452,7 @@ code[data-kind="command"]::before {
 
 .hero__lede {
     max-width: 32rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     color: var(--fg-mute);
     font-family: "JetBrains Mono", "Noto Sans JP", monospace;
     font-size: 0.95rem;
@@ -547,7 +547,7 @@ code[data-kind="command"]::before {
 
     .hero__copy {
         width: 50%;
-        padding: 5rem 4rem;
+        padding: 5.5rem 4rem;
         border-right: 2px solid var(--line);
         display: flex;
         flex-direction: column;
@@ -569,20 +569,20 @@ code[data-kind="command"]::before {
 
 .release {
     background: var(--base);
-    padding: 2rem 1.5rem;
+    padding: 2.5rem 1.5rem;
 }
 
 .release__panel {
     border: 2px solid var(--success);
     background: var(--surface);
-    padding: 1.25rem;
+    padding: 1.5rem;
     font-size: 0.9rem;
 }
 
 .release__head {
     font-weight: 700;
     color: var(--success);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
 }
 
 .release__body {
@@ -636,16 +636,16 @@ code[data-kind="command"]::before {
 }
 
 .split__sticky {
-    padding: 3rem 1.5rem;
+    padding: 3.5rem 1.5rem;
 }
 
 .split__title {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     text-transform: uppercase;
 }
 
 .split__lede {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     color: var(--fg-mute);
     font-family: "JetBrains Mono", "Noto Sans JP", monospace;
     font-size: 0.875rem;
@@ -667,7 +667,7 @@ code[data-kind="command"]::before {
 }
 
 .stagger {
-    padding: 3rem 1.5rem;
+    padding: 3.5rem 1.5rem;
     border-bottom: 2px solid var(--line);
 }
 
@@ -676,18 +676,18 @@ code[data-kind="command"]::before {
 }
 
 .stagger__num {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     color: var(--accent);
 }
 
 .stagger__title {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     text-transform: uppercase;
 }
 
 .stagger__body {
     max-width: 36rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
     color: var(--fg-mute);
     font-size: 0.95rem;
 }
@@ -716,7 +716,7 @@ code[data-kind="command"]::before {
     .split__sticky {
         position: sticky;
         top: var(--nav-h);
-        padding: 3rem;
+        padding: 3.5rem;
     }
 
     .split__main {
@@ -724,7 +724,7 @@ code[data-kind="command"]::before {
     }
 
     .stagger {
-        padding: 3rem;
+        padding: 3.5rem;
     }
 }
 
@@ -732,33 +732,33 @@ code[data-kind="command"]::before {
 
 .sect {
     background: var(--base);
-    padding: 3rem 1.5rem;
+    padding: 4rem 1.5rem;
 }
 
 .sect__eyebrow {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     color: var(--accent);
 }
 
 .sect__title {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     text-transform: uppercase;
 }
 
 .sect__title--second {
-    margin-top: 4rem;
+    margin-top: 5rem;
 }
 
 .sect__lede {
     max-width: 44rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     color: var(--fg-mute);
     font-size: 0.95rem;
 }
 
 @media (min-width: 768px) {
     .sect {
-        padding: 5rem 3rem;
+        padding: 6.5rem 3rem;
     }
 }
 
@@ -780,7 +780,7 @@ code[data-kind="command"]::before {
 }
 
 .rows__key {
-    padding: 1.25rem;
+    padding: 1.5rem;
     font-weight: 700;
     background: var(--base);
 }
@@ -790,7 +790,7 @@ code[data-kind="command"]::before {
 }
 
 .rows__val {
-    padding: 1.25rem;
+    padding: 1.5rem;
     color: var(--fg-mute);
     font-size: 0.95rem;
 }
@@ -811,22 +811,22 @@ code[data-kind="command"]::before {
 
 .two-col {
     display: grid;
-    gap: 2rem;
+    gap: 2.5rem;
 }
 
 .strengths {
     display: grid;
-    gap: 2rem;
+    gap: 2.5rem;
     align-content: start;
 }
 
 .strength {
     border-left: 2px solid var(--line);
-    padding-left: 1.25rem;
+    padding-left: 1.5rem;
 }
 
 .strength__title {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
     font-size: 1.05rem;
     font-weight: 700;
 }
@@ -841,20 +841,20 @@ code[data-kind="command"]::before {
 }
 
 .today {
-    padding: 2rem;
+    padding: 2.25rem;
     align-self: start;
 }
 
 .today__title {
-    padding-bottom: 1rem;
-    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.75rem;
     border-bottom: 2px solid var(--line);
     text-transform: uppercase;
 }
 
 .today__list {
     display: grid;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .today__list li {
@@ -889,7 +889,7 @@ code[data-kind="command"]::before {
 .note {
     border: 2px solid var(--accent);
     background: var(--surface);
-    padding: 1.25rem;
+    padding: 1.5rem;
     font-size: 0.9rem;
     color: var(--fg-mute);
 }
@@ -913,12 +913,12 @@ code[data-kind="command"]::before {
 
 .cards {
     display: grid;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
 }
 
 .card {
-    padding: 1.5rem;
+    padding: 1.75rem;
 }
 
 .card p {
@@ -965,12 +965,12 @@ code[data-kind="command"]::before {
 
 .pkgs {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .pkg {
     display: block;
-    padding: 1.5rem;
+    padding: 1.75rem;
     text-decoration: none;
 }
 
@@ -999,12 +999,12 @@ code[data-kind="command"]::before {
 
 .docs {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .doc {
     display: block;
-    padding: 1.5rem;
+    padding: 1.75rem;
     text-decoration: none;
 }
 
@@ -1068,8 +1068,8 @@ code[data-kind="command"]::before {
 .foot {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
-    padding: 3rem 1.5rem;
+    gap: 3rem;
+    padding: 3.5rem 1.5rem;
 }
 
 .foot__mark-row {
@@ -1101,7 +1101,7 @@ code[data-kind="command"]::before {
 .foot__cols {
     display: flex;
     flex-wrap: wrap;
-    gap: 2.5rem;
+    gap: 3rem;
 }
 
 .foot__col {
@@ -1130,7 +1130,7 @@ code[data-kind="command"]::before {
     .foot {
         flex-direction: row;
         justify-content: space-between;
-        padding: 3rem;
+        padding: 3.5rem;
     }
 }
 
