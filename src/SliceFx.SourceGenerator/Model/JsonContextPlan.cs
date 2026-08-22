@@ -115,6 +115,18 @@ internal enum JsonContextTarget
 
 internal readonly record struct JsonRootType(string TypeFqn);
 
+internal readonly record struct WasiCompatibilityIssue(string Code, string Category, string Message)
+{
+    // Fixed category vocabulary for WASI compatibility issues, serialized into the route manifest
+    // and decoded verbatim by the CLI (tools/SliceFx.Cli/Internal/GeneratedRouteCatalog.cs). The CLI
+    // treats Category as an opaque pass-through string rather than duplicating these constants,
+    // since it never branches on the value today.
+    public const string CategoryReturnType = "return-type";
+    public const string CategoryValidation = "validation";
+    public const string CategoryParameterBinding = "parameter-binding";
+    public const string CategoryJsonContext = "json-context";
+}
+
 internal readonly record struct FeatureJsonExclusion(
     JsonContextTarget Target,
     string FeatureTypeFqn,

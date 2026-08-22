@@ -174,21 +174,53 @@ internal static class JsonContextPlanner
         string serializedSerializableTypes = "")
         => CreatePlan(JsonContextTarget.AspNet, features, explicitContextFqn, serializedSerializableTypes);
 
-    public static string StatusForWasi(FeatureModel feature, JsonContextPlan plan)
+    /// <summary>
+    /// Returns every independent reason <paramref name="feature"/> is excluded/degraded on the WASI
+    /// dispatch path, without short-circuiting on the first one found. Unlike
+    /// <see cref="GetWasiStructuralSkipReason"/> (an if-chain used by <see cref="CreatePlan"/> to decide
+    /// whether to collect JSON roots at all), this evaluates every independent check. The JSON-context
+    /// check at the end relies on <see cref="CreatePlan"/>'s existing invariant: an exclusion is only
+    /// ever recorded for a feature when none of the structural checks below already applied to it, so
+    /// calling <see cref="FindExclusion"/> unconditionally is safe — it naturally returns null whenever
+    /// a structural issue was already found.
+    /// </summary>
+    public static ImmutableArray<WasiCompatibilityIssue> GetWasiCompatibilityIssues(FeatureModel feature, JsonContextPlan plan)
     {
-        var serializableTypes = plan.GetSerializableTypesSet();
-        if (GetWasiStructuralSkipReason(feature, serializableTypes) is not null || FindExclusion(plan, feature) is not null)
+        var issues = ImmutableArray.CreateBuilder<WasiCompatibilityIssue>();
+
+        if (feature.ReturnsAspNetResult)
         {
-            return SourceGenerationHelpers.ManifestIneligible;
+            issues.Add(new WasiCompatibilityIssue(
+                "SLICE020", WasiCompatibilityIssue.CategoryReturnType, "IResult is ASP.NET-specific"));
         }
 
-        return SourceGenerationHelpers.ManifestEligible;
-    }
+        if (feature.RequiresReflectionValidation)
+        {
+            foreach (var unsupported in feature.GetUnsupportedValidationAttributes())
+            {
+                var message = string.IsNullOrEmpty(unsupported.PropertyName)
+                    ? $"DataAnnotations attribute '{unsupported.AttributeName}' requires reflection and is not supported in the WASI path."
+                    : $"Property '{unsupported.PropertyName}': DataAnnotations attribute '{unsupported.AttributeName}' requires reflection and is not supported in the WASI path.";
+                issues.Add(new WasiCompatibilityIssue("SLICE022", WasiCompatibilityIssue.CategoryValidation, message));
+            }
+        }
 
-    public static string? ReasonForWasi(FeatureModel feature, JsonContextPlan plan)
-    {
         var serializableTypes = plan.GetSerializableTypesSet();
-        return GetWasiStructuralSkipReason(feature, serializableTypes) ?? FindExclusion(plan, feature)?.Reason;
+        foreach (var reason in EnumerateParameterBindingIssues(feature, serializableTypes))
+        {
+            issues.Add(new WasiCompatibilityIssue(
+                "SLICE023",
+                WasiCompatibilityIssue.CategoryParameterBinding,
+                reason ?? "parameter binding is unsupported"));
+        }
+
+        var exclusion = FindExclusion(plan, feature);
+        if (exclusion is not null)
+        {
+            issues.Add(new WasiCompatibilityIssue("SLICE021", WasiCompatibilityIssue.CategoryJsonContext, exclusion.Value.Reason));
+        }
+
+        return issues.ToImmutable();
     }
 
     public static string? ReasonForLambda(FeatureModel feature, JsonContextPlan plan)
@@ -342,6 +374,10 @@ internal static class JsonContextPlanner
             };
             if (structuralSkipReason is not null)
             {
+                // For target Wasi, GetWasiCompatibilityIssues relies on this branch skipping root
+                // collection entirely: it assumes an exclusion is only ever recorded below for a
+                // feature with no structural issue, so it can call FindExclusion unconditionally
+                // without double-reporting. Changing this control flow requires updating that method.
                 continue;
             }
 
@@ -547,11 +583,23 @@ internal static class JsonContextPlanner
     private static string? GetParameterBindingSkipReason(
         FeatureModel feature,
         HashSet<string>? serializableTypes = null)
+        => EnumerateParameterBindingIssues(feature, serializableTypes).FirstOrDefault();
+
+    /// <summary>
+    /// Yields one entry per unsupported parameter-binding cause for <paramref name="feature"/> — an
+    /// ambiguous body parameter yields exactly one entry and stops; otherwise every unsupported
+    /// parameter yields its own entry. Shared by <see cref="GetParameterBindingSkipReason"/> (first
+    /// match only) and <see cref="GetWasiCompatibilityIssues"/> (every match).
+    /// </summary>
+    private static IEnumerable<string?> EnumerateParameterBindingIssues(
+        FeatureModel feature,
+        HashSet<string>? serializableTypes)
     {
         var selection = SourceGenerationHelpers.SelectBodyParameter(feature, serializableTypes);
         if (selection.AmbiguousWith is not null)
         {
-            return "multiple body parameters are not supported";
+            yield return "multiple body parameters are not supported";
+            yield break;
         }
 
         foreach (var p in feature.GetParams())
@@ -567,11 +615,9 @@ internal static class JsonContextPlanner
                 selection.Body);
             if (binding.Source == HandlerParameterBindingSource.Unsupported)
             {
-                return binding.UnsupportedReason;
+                yield return binding.UnsupportedReason;
             }
         }
-
-        return null;
     }
 
     private static bool IsPassthroughResponseType(JsonContextTarget target, string responseType)

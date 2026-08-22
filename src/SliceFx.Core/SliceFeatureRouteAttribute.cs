@@ -36,7 +36,9 @@ public sealed class SliceFeatureRouteAttribute : Attribute
         string? lambdaFunctionPerFeatureBootstrapMode,
         string? lambdaFunctionPerFeatureRuntimeIdentifier,
         // arg index 25 (tail-appended — do NOT insert before this)
-        string? serializedSliceFilterTypes = null)
+        string? serializedSliceFilterTypes = null,
+        // arg index 26 (tail-appended — do NOT insert before this)
+        string? serializedWasiCompatibilityIssues = null)
     {
         EndpointName = endpointName;
         FeatureType = featureType;
@@ -64,6 +66,7 @@ public sealed class SliceFeatureRouteAttribute : Attribute
         LambdaFunctionPerFeatureBootstrapMode = lambdaFunctionPerFeatureBootstrapMode;
         LambdaFunctionPerFeatureRuntimeIdentifier = lambdaFunctionPerFeatureRuntimeIdentifier;
         SerializedSliceFilterTypes = serializedSliceFilterTypes;
+        SerializedWasiCompatibilityIssues = serializedWasiCompatibilityIssues;
     }
 
     /// <summary>
@@ -197,4 +200,10 @@ public sealed class SliceFeatureRouteAttribute : Attribute
     /// and WASI dispatch paths.
     /// </summary>
     public string? SerializedSliceFilterTypes { get; }
+
+    /// <summary>
+    /// Gets newline-separated WASI compatibility issues, each encoded as
+    /// <c>code|category|base64(message)</c>. Null when the route has no WASI compatibility issues.
+    /// </summary>
+    public string? SerializedWasiCompatibilityIssues { get; }
 }
