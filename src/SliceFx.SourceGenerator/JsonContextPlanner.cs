@@ -174,17 +174,6 @@ internal static class JsonContextPlanner
         string serializedSerializableTypes = "")
         => CreatePlan(JsonContextTarget.AspNet, features, explicitContextFqn, serializedSerializableTypes);
 
-    public static string StatusForWasi(FeatureModel feature, JsonContextPlan plan)
-        => GetWasiCompatibilityIssues(feature, plan).IsEmpty
-            ? SourceGenerationHelpers.ManifestEligible
-            : SourceGenerationHelpers.ManifestIneligible;
-
-    public static string? ReasonForWasi(FeatureModel feature, JsonContextPlan plan)
-    {
-        var issues = GetWasiCompatibilityIssues(feature, plan);
-        return issues.IsEmpty ? null : issues[0].Message;
-    }
-
     /// <summary>
     /// Returns every independent reason <paramref name="feature"/> is excluded/degraded on the WASI
     /// dispatch path, without short-circuiting on the first one found. Unlike
@@ -217,30 +206,12 @@ internal static class JsonContextPlanner
         }
 
         var serializableTypes = plan.GetSerializableTypesSet();
-        var selection = SourceGenerationHelpers.SelectBodyParameter(feature, serializableTypes);
-        if (selection.AmbiguousWith is not null)
+        foreach (var reason in EnumerateParameterBindingIssues(feature, serializableTypes))
         {
             issues.Add(new WasiCompatibilityIssue(
-                "SLICE023", WasiCompatibilityIssue.CategoryParameterBinding, "multiple body parameters are not supported"));
-        }
-        else
-        {
-            foreach (var p in feature.GetParams())
-            {
-                if (p.TypeFqn == "global::System.Threading.CancellationToken")
-                {
-                    continue;
-                }
-
-                var binding = SourceGenerationHelpers.ResolveParameterBinding(p, feature.Pattern, selection.Body);
-                if (binding.Source == HandlerParameterBindingSource.Unsupported)
-                {
-                    issues.Add(new WasiCompatibilityIssue(
-                        "SLICE023",
-                        WasiCompatibilityIssue.CategoryParameterBinding,
-                        binding.UnsupportedReason ?? "parameter binding is unsupported"));
-                }
-            }
+                "SLICE023",
+                WasiCompatibilityIssue.CategoryParameterBinding,
+                reason ?? "parameter binding is unsupported"));
         }
 
         var exclusion = FindExclusion(plan, feature);
@@ -403,6 +374,10 @@ internal static class JsonContextPlanner
             };
             if (structuralSkipReason is not null)
             {
+                // For target Wasi, GetWasiCompatibilityIssues relies on this branch skipping root
+                // collection entirely: it assumes an exclusion is only ever recorded below for a
+                // feature with no structural issue, so it can call FindExclusion unconditionally
+                // without double-reporting. Changing this control flow requires updating that method.
                 continue;
             }
 
@@ -608,11 +583,23 @@ internal static class JsonContextPlanner
     private static string? GetParameterBindingSkipReason(
         FeatureModel feature,
         HashSet<string>? serializableTypes = null)
+        => EnumerateParameterBindingIssues(feature, serializableTypes).FirstOrDefault();
+
+    /// <summary>
+    /// Yields one entry per unsupported parameter-binding cause for <paramref name="feature"/> — an
+    /// ambiguous body parameter yields exactly one entry and stops; otherwise every unsupported
+    /// parameter yields its own entry. Shared by <see cref="GetParameterBindingSkipReason"/> (first
+    /// match only) and <see cref="GetWasiCompatibilityIssues"/> (every match).
+    /// </summary>
+    private static IEnumerable<string?> EnumerateParameterBindingIssues(
+        FeatureModel feature,
+        HashSet<string>? serializableTypes)
     {
         var selection = SourceGenerationHelpers.SelectBodyParameter(feature, serializableTypes);
         if (selection.AmbiguousWith is not null)
         {
-            return "multiple body parameters are not supported";
+            yield return "multiple body parameters are not supported";
+            yield break;
         }
 
         foreach (var p in feature.GetParams())
@@ -628,11 +615,9 @@ internal static class JsonContextPlanner
                 selection.Body);
             if (binding.Source == HandlerParameterBindingSource.Unsupported)
             {
-                return binding.UnsupportedReason;
+                yield return binding.UnsupportedReason;
             }
         }
-
-        return null;
     }
 
     private static bool IsPassthroughResponseType(JsonContextTarget target, string responseType)
