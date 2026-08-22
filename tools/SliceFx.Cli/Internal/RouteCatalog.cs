@@ -347,17 +347,17 @@ internal static class RouteCatalog
     {
         if (returnType.Length == 0)
         {
-            return new RouteCapability(LambdaUnknown, "Handle method not found", []);
+            return new RouteCapability(LambdaUnknown, "Handle method not found");
         }
 
         if (returnType.Contains("IResult", StringComparison.Ordinal))
         {
-            return new RouteCapability(LambdaIneligible, "returns ASP.NET IResult", []);
+            return new RouteCapability(LambdaIneligible, "returns ASP.NET IResult");
         }
 
         if (filters.Length > 0)
         {
-            return new RouteCapability(LambdaIneligible, "endpoint filters require the ASP.NET endpoint filter pipeline", []);
+            return new RouteCapability(LambdaIneligible, "endpoint filters require the ASP.NET endpoint filter pipeline");
         }
 
         foreach (var parameter in parameters)
@@ -374,12 +374,11 @@ internal static class RouteCatalog
             {
                 return new RouteCapability(
                     LambdaIneligible,
-                    $"route parameter '{parameter.Name}' has unsupported type '{parameter.Type}'",
-                    []);
+                    $"route parameter '{parameter.Name}' has unsupported type '{parameter.Type}'");
             }
         }
 
-        return new RouteCapability(LambdaEligible, null, []);
+        return new RouteCapability(LambdaEligible, null);
     }
 
     private static bool IsSimpleType(string type)
