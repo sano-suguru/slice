@@ -2645,8 +2645,8 @@ public class SourceGeneratorCompileTests
         Assert.Contains("string? LambdaFunctionPerFeatureStatus", manifestSource, StringComparison.Ordinal);
         Assert.Contains("string? LambdaFunctionPerFeatureArtifactId", manifestSource, StringComparison.Ordinal);
         Assert.Contains("string? WasiDispatchStatus", manifestSource, StringComparison.Ordinal);
-        // 26 args: [..., manifestSchemaVersion="1", wasiStatus="eligible", ..., lambdaRuntimeIdentifier=null, serializedSliceFilterTypes=null]
-        Assert.Contains("\"1\",\"eligible\",null,null,null,null,null,null,null)]", compactManifestSource, StringComparison.Ordinal);
+        // 27 args: [..., manifestSchemaVersion="1", wasiStatus="eligible", ..., lambdaRuntimeIdentifier=null, serializedSliceFilterTypes=null, serializedWasiCompatibilityIssues=null]
+        Assert.Contains("\"1\",\"eligible\",null,null,null,null,null,null,null,null)]", compactManifestSource, StringComparison.Ordinal);
         Assert.Contains("\"1\",true,\"portable\",null,\"eligible\",null,null,null,null,null,null,null,null,null,null,null,global::System.Array.Empty<string>())", compactManifestSource, StringComparison.Ordinal);
         Assert.DoesNotContain("\"shared\"", compactManifestSource, StringComparison.Ordinal);
     }
@@ -4676,6 +4676,106 @@ public class SourceGeneratorCompileTests
             .Single(tree => tree.FilePath.EndsWith(hintNameSuffix, StringComparison.Ordinal))
             .GetText()
             .ToString();
+
+    private static List<(string Code, string Category, string Message)> ExtractWasiCompatibilityIssues(string manifestSource, string featureTypeFqn)
+    {
+        // The route attribute literal is one long line; find the one for this feature by its FQN
+        // literal, then take the 27th (0-indexed 26th) string argument — the tail-appended
+        // serializedWasiCompatibilityIssues — which is either `null` or a C# verbatim string literal.
+        var marker = $"\"{featureTypeFqn}\"";
+        var lineStart = manifestSource.IndexOf(marker, StringComparison.Ordinal);
+        Assert.True(lineStart >= 0, $"Could not find route attribute for '{featureTypeFqn}'.");
+        var lineEnd = manifestSource.IndexOf(")]", lineStart, StringComparison.Ordinal);
+        var line = manifestSource[lineStart..lineEnd];
+
+        var lastArgStart = line.LastIndexOf(", ", StringComparison.Ordinal) + 2;
+        var rawArg = line[lastArgStart..].Trim();
+        if (rawArg == "null")
+        {
+            return [];
+        }
+
+        // rawArg is a C# string literal like "SLICE023|parameter-binding|<base64>\nSLICE023|...".
+        var decoded = System.Text.Json.JsonSerializer.Deserialize<string>(
+            "\"" + rawArg[1..^1].Replace("\\\"", "\"") + "\"")!;
+        var result = new List<(string Code, string Category, string Message)>();
+        foreach (var entry in decoded.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = entry.Split('|');
+            result.Add((parts[0], parts[1], System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(parts[2]))));
+        }
+
+        return result;
+    }
+
+    [Fact]
+    public void Manifest_reports_every_unsupported_wasi_parameter_not_just_the_first()
+    {
+        var source = """
+            using System.Threading.Tasks;
+            using Microsoft.AspNetCore.Http;
+            using SliceFx;
+
+            namespace WasiIssuesApp.Features.Orders
+            {
+                [Feature("GET /orders/{id}")]
+                public static class GetOrder
+                {
+                    public static Task<string> Handle(
+                        string id,
+                        [AsParameters] Filter a,
+                        [AsParameters] Filter b) => Task.FromResult(id);
+
+                    public sealed record Filter(string Value);
+                }
+            }
+            """;
+
+        var compilation = CreateHostCompilation("WasiIssuesApp", source, includeWasiReference: true);
+        GeneratorDriver driver = CreateDriver();
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diags, TestContext.Current.CancellationToken);
+
+        Assert.DoesNotContain(diags, static d => d.Severity == DiagnosticSeverity.Error);
+        var manifest = GetGeneratedSource(driver, "SliceRouteManifest.g.cs");
+        var issues = ExtractWasiCompatibilityIssues(manifest, "WasiIssuesApp.Features.Orders.GetOrder");
+        Assert.Equal(2, issues.Count(static i => i.Code == "SLICE023"));
+    }
+
+    [Fact]
+    public void Manifest_reports_property_name_for_each_unsupported_validation_attribute()
+    {
+        var source = """
+            using System.ComponentModel.DataAnnotations;
+            using System.Threading.Tasks;
+            using SliceFx;
+
+            namespace WasiValidationIssuesApp.Features.Users
+            {
+                [Feature("POST /users")]
+                public static class CreateUser
+                {
+                    public sealed record Request(
+                        [CustomValidation(typeof(CreateUser), nameof(ValidateName))] string Name,
+                        [CustomValidation(typeof(CreateUser), nameof(ValidateEmail))] string Email);
+
+                    public static Task<string> Handle(Request req) => Task.FromResult(req.Name);
+
+                    public static ValidationResult? ValidateName(string value, ValidationContext context) => ValidationResult.Success;
+                    public static ValidationResult? ValidateEmail(string value, ValidationContext context) => ValidationResult.Success;
+                }
+            }
+            """;
+
+        var compilation = CreateHostCompilation("WasiValidationIssuesApp", source, includeWasiReference: true);
+        GeneratorDriver driver = CreateDriver();
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out var diags, TestContext.Current.CancellationToken);
+
+        var manifest = GetGeneratedSource(driver, "SliceRouteManifest.g.cs");
+        var issues = ExtractWasiCompatibilityIssues(manifest, "WasiValidationIssuesApp.Features.Users.CreateUser");
+
+        Assert.Contains(issues, i => i.Code == "SLICE022" && i.Message.Contains("Property 'Name'", StringComparison.Ordinal));
+        Assert.Contains(issues, i => i.Code == "SLICE022" && i.Message.Contains("Property 'Email'", StringComparison.Ordinal));
+    }
 
     private static DiagnosticCatalogEntry[] GetDiagnosticCatalog()
     {

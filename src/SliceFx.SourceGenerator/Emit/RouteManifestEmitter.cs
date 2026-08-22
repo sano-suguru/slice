@@ -90,7 +90,7 @@ internal static class RouteManifestEmitter
             var feature = route.Feature;
 
             sb.AppendLine(
-                $"[assembly: global::SliceFx.SliceFeatureRouteAttribute({CSharpLiteral.String(feature.EndpointName)}, {CSharpLiteral.String(SourceGenerationHelpers.TrimGlobalAlias(feature.FullyQualifiedTypeName))}, {CSharpLiteral.String(feature.HttpMethod)}, {CSharpLiteral.String(feature.Pattern)}, {CSharpLiteral.String(feature.Tag)}, {CSharpNullableStringLiteral(feature.Summary)}, {CSharpNullableStringLiteral(FindRequestType(feature, serializableTypes))}, {CSharpLiteral.String(SourceGenerationHelpers.TrimGlobalAlias(feature.ReturnTypeFqn))}, {CSharpLiteral.String(route.Portability)}, {CSharpNullableStringLiteral(route.PortabilityReason)}, {CSharpNullableStringLiteral(SerializeFilterTypes(feature))}, {CSharpNullableStringLiteral(SerializeParameters(feature))}, {CSharpNullableStringLiteral(route.LambdaStatus)}, {CSharpNullableStringLiteral(route.LambdaReason)}, {CSharpNullableStringLiteral(route.LambdaHandlerAssembly)}, {CSharpNullableStringLiteral(route.LambdaHandlerType)}, {CSharpNullableStringLiteral(route.LambdaHandlerMethod)}, {CSharpLiteral.String(SourceGenerationHelpers.ManifestSchemaVersion)}, {CSharpNullableStringLiteral(route.WasiStatus)}, {CSharpNullableStringLiteral(route.WasiReason)}, {CSharpNullableStringLiteral(route.LambdaArtifactId)}, {CSharpNullableStringLiteral(route.LambdaArtifactLayout)}, {CSharpNullableStringLiteral(route.LambdaArtifactCodeUri)}, {CSharpNullableStringLiteral(route.LambdaBootstrapMode)}, {CSharpNullableStringLiteral(route.LambdaRuntimeIdentifier)}, {CSharpNullableStringLiteral(SerializeSliceFilterTypes(feature))})]");
+                $"[assembly: global::SliceFx.SliceFeatureRouteAttribute({CSharpLiteral.String(feature.EndpointName)}, {CSharpLiteral.String(SourceGenerationHelpers.TrimGlobalAlias(feature.FullyQualifiedTypeName))}, {CSharpLiteral.String(feature.HttpMethod)}, {CSharpLiteral.String(feature.Pattern)}, {CSharpLiteral.String(feature.Tag)}, {CSharpNullableStringLiteral(feature.Summary)}, {CSharpNullableStringLiteral(FindRequestType(feature, serializableTypes))}, {CSharpLiteral.String(SourceGenerationHelpers.TrimGlobalAlias(feature.ReturnTypeFqn))}, {CSharpLiteral.String(route.Portability)}, {CSharpNullableStringLiteral(route.PortabilityReason)}, {CSharpNullableStringLiteral(SerializeFilterTypes(feature))}, {CSharpNullableStringLiteral(SerializeParameters(feature))}, {CSharpNullableStringLiteral(route.LambdaStatus)}, {CSharpNullableStringLiteral(route.LambdaReason)}, {CSharpNullableStringLiteral(route.LambdaHandlerAssembly)}, {CSharpNullableStringLiteral(route.LambdaHandlerType)}, {CSharpNullableStringLiteral(route.LambdaHandlerMethod)}, {CSharpLiteral.String(SourceGenerationHelpers.ManifestSchemaVersion)}, {CSharpNullableStringLiteral(route.WasiStatus)}, {CSharpNullableStringLiteral(route.WasiReason)}, {CSharpNullableStringLiteral(route.LambdaArtifactId)}, {CSharpNullableStringLiteral(route.LambdaArtifactLayout)}, {CSharpNullableStringLiteral(route.LambdaArtifactCodeUri)}, {CSharpNullableStringLiteral(route.LambdaBootstrapMode)}, {CSharpNullableStringLiteral(route.LambdaRuntimeIdentifier)}, {CSharpNullableStringLiteral(SerializeSliceFilterTypes(feature))}, {CSharpNullableStringLiteral(route.SerializedWasiCompatibilityIssues)})]");
         }
     }
 
@@ -197,8 +197,10 @@ internal static class RouteManifestEmitter
         foreach (var feature in features)
         {
             var (portability, portabilityReason) = ClassifyPortability(feature, serializableTypes);
-            var wasiStatus = JsonContextPlanner.StatusForWasi(feature, wasiJsonContextPlan);
-            var wasiReason = JsonContextPlanner.ReasonForWasi(feature, wasiJsonContextPlan);
+            var wasiIssues = JsonContextPlanner.GetWasiCompatibilityIssues(feature, wasiJsonContextPlan);
+            var wasiStatus = wasiIssues.IsEmpty ? SourceGenerationHelpers.ManifestEligible : SourceGenerationHelpers.ManifestIneligible;
+            var wasiReason = wasiIssues.IsEmpty ? null : wasiIssues[0].Message;
+            var serializedWasiIssues = SerializeWasiCompatibilityIssues(wasiIssues);
             var lambda =
                 GetEmittedLambdaMetadata(feature, assemblyName, emitLambdaFunctionPerFeatureHandlers, lambdaJsonContextPlan);
             routes.Add(new RouteManifestEntry(
@@ -207,6 +209,7 @@ internal static class RouteManifestEmitter
                 portabilityReason,
                 wasiStatus,
                 wasiReason,
+                serializedWasiIssues,
                 lambda.Status,
                 lambda.Reason,
                 lambda.HandlerAssembly,
@@ -436,6 +439,11 @@ internal static class RouteManifestEmitter
 
     private static string CSharpNullableStringLiteral(string? value)
         => value is null ? "null" : CSharpLiteral.String(value);
+
+    private static string? SerializeWasiCompatibilityIssues(ImmutableArray<WasiCompatibilityIssue> issues)
+        => issues.IsEmpty
+            ? null
+            : string.Join("\n", issues.Select(static issue => $"{issue.Code}|{issue.Category}|{EncodeManifestField(issue.Message)}"));
 }
 
 internal readonly record struct RouteManifestEntry(
@@ -444,6 +452,7 @@ internal readonly record struct RouteManifestEntry(
     string? PortabilityReason,
     string WasiStatus,
     string? WasiReason,
+    string? SerializedWasiCompatibilityIssues,
     string? LambdaStatus,
     string? LambdaReason,
     string? LambdaHandlerAssembly,

@@ -175,20 +175,81 @@ internal static class JsonContextPlanner
         => CreatePlan(JsonContextTarget.AspNet, features, explicitContextFqn, serializedSerializableTypes);
 
     public static string StatusForWasi(FeatureModel feature, JsonContextPlan plan)
-    {
-        var serializableTypes = plan.GetSerializableTypesSet();
-        if (GetWasiStructuralSkipReason(feature, serializableTypes) is not null || FindExclusion(plan, feature) is not null)
-        {
-            return SourceGenerationHelpers.ManifestIneligible;
-        }
-
-        return SourceGenerationHelpers.ManifestEligible;
-    }
+        => GetWasiCompatibilityIssues(feature, plan).IsEmpty
+            ? SourceGenerationHelpers.ManifestEligible
+            : SourceGenerationHelpers.ManifestIneligible;
 
     public static string? ReasonForWasi(FeatureModel feature, JsonContextPlan plan)
     {
+        var issues = GetWasiCompatibilityIssues(feature, plan);
+        return issues.IsEmpty ? null : issues[0].Message;
+    }
+
+    /// <summary>
+    /// Returns every independent reason <paramref name="feature"/> is excluded/degraded on the WASI
+    /// dispatch path, without short-circuiting on the first one found. Unlike
+    /// <see cref="GetWasiStructuralSkipReason"/> (an if-chain used by <see cref="CreatePlan"/> to decide
+    /// whether to collect JSON roots at all), this evaluates every independent check. The JSON-context
+    /// check at the end relies on <see cref="CreatePlan"/>'s existing invariant: an exclusion is only
+    /// ever recorded for a feature when none of the structural checks below already applied to it, so
+    /// calling <see cref="FindExclusion"/> unconditionally is safe — it naturally returns null whenever
+    /// a structural issue was already found.
+    /// </summary>
+    public static ImmutableArray<WasiCompatibilityIssue> GetWasiCompatibilityIssues(FeatureModel feature, JsonContextPlan plan)
+    {
+        var issues = ImmutableArray.CreateBuilder<WasiCompatibilityIssue>();
+
+        if (feature.ReturnsAspNetResult)
+        {
+            issues.Add(new WasiCompatibilityIssue(
+                "SLICE020", WasiCompatibilityIssue.CategoryReturnType, "IResult is ASP.NET-specific"));
+        }
+
+        if (feature.RequiresReflectionValidation)
+        {
+            foreach (var unsupported in feature.GetUnsupportedValidationAttributes())
+            {
+                var message = string.IsNullOrEmpty(unsupported.PropertyName)
+                    ? $"DataAnnotations attribute '{unsupported.AttributeName}' requires reflection and is not supported in the WASI path."
+                    : $"Property '{unsupported.PropertyName}': DataAnnotations attribute '{unsupported.AttributeName}' requires reflection and is not supported in the WASI path.";
+                issues.Add(new WasiCompatibilityIssue("SLICE022", WasiCompatibilityIssue.CategoryValidation, message));
+            }
+        }
+
         var serializableTypes = plan.GetSerializableTypesSet();
-        return GetWasiStructuralSkipReason(feature, serializableTypes) ?? FindExclusion(plan, feature)?.Reason;
+        var selection = SourceGenerationHelpers.SelectBodyParameter(feature, serializableTypes);
+        if (selection.AmbiguousWith is not null)
+        {
+            issues.Add(new WasiCompatibilityIssue(
+                "SLICE023", WasiCompatibilityIssue.CategoryParameterBinding, "multiple body parameters are not supported"));
+        }
+        else
+        {
+            foreach (var p in feature.GetParams())
+            {
+                if (p.TypeFqn == "global::System.Threading.CancellationToken")
+                {
+                    continue;
+                }
+
+                var binding = SourceGenerationHelpers.ResolveParameterBinding(p, feature.Pattern, selection.Body);
+                if (binding.Source == HandlerParameterBindingSource.Unsupported)
+                {
+                    issues.Add(new WasiCompatibilityIssue(
+                        "SLICE023",
+                        WasiCompatibilityIssue.CategoryParameterBinding,
+                        binding.UnsupportedReason ?? "parameter binding is unsupported"));
+                }
+            }
+        }
+
+        var exclusion = FindExclusion(plan, feature);
+        if (exclusion is not null)
+        {
+            issues.Add(new WasiCompatibilityIssue("SLICE021", WasiCompatibilityIssue.CategoryJsonContext, exclusion.Value.Reason));
+        }
+
+        return issues.ToImmutable();
     }
 
     public static string? ReasonForLambda(FeatureModel feature, JsonContextPlan plan)
