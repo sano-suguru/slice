@@ -392,6 +392,8 @@ internal static class GeneratedRouteCatalog
         var lambdaRuntimeIdentifier = GetString(args[24]);
         // arg index 25: neutral (ISliceFilter) filter types, tail-appended in schema version 1.
         var sliceFilters = SplitLines(GetString(args[25]));
+        // arg index 26: WASI compatibility issues, tail-appended in schema version 1.
+        var wasiCompatibilityIssues = ReadWasiCompatibilityIssues(GetString(args[26]));
 
         return new SliceRouteInfo(
             method.ToUpperInvariant(),
@@ -422,7 +424,8 @@ internal static class GeneratedRouteCatalog
             wasiReason,
             HasGeneratedMetadata: true,
             SourceAssemblyName: sourceAssemblyName,
-            SliceFilters: sliceFilters);
+            SliceFilters: sliceFilters,
+            WasiCompatibilityIssues: wasiCompatibilityIssues);
     }
 
     private static string? GetString(CustomAttributeTypedArgument<string> argument)
@@ -498,6 +501,28 @@ internal static class GeneratedRouteCatalog
         {
             throw new InvalidRouteManifestException("parameter metadata contains an invalid encoded field");
         }
+    }
+
+    private static WasiCompatibilityIssue[] ReadWasiCompatibilityIssues(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return [];
+        }
+
+        var issues = new List<WasiCompatibilityIssue>();
+        foreach (var line in SplitLines(value))
+        {
+            var parts = line.Split('|');
+            if (parts.Length != 3)
+            {
+                continue;
+            }
+
+            issues.Add(new WasiCompatibilityIssue(parts[0], parts[1], DecodeManifestField(parts[2])));
+        }
+
+        return [.. issues];
     }
 
     private sealed class StringAttributeTypeProvider : ICustomAttributeTypeProvider<string>

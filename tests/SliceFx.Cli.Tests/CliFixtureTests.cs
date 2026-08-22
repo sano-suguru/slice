@@ -242,6 +242,45 @@ public class CliFixtureTests
     }
 
     [Fact]
+    public void Route_target_capabilities_surface_wasi_compatibility_issues()
+    {
+        var baseRoute = new SliceRouteInfo(
+            "POST",
+            "/orders",
+            "My.App.Features.Orders",
+            "CreateOrder",
+            "Orders",
+            "Orders.CreateOrder",
+            null,
+            null,
+            "global::System.String",
+            RouteCatalog.PortabilityPortable,
+            null,
+            [],
+            []);
+
+        var routeWithIssues = baseRoute with
+        {
+            ManifestSchemaVersion = "1",
+            WasiDispatchStatus = RouteTargetCapabilities.Ineligible,
+            WasiDispatchReason = "multiple body parameters are not supported",
+            WasiCompatibilityIssues =
+            [
+                new WasiCompatibilityIssue("SLICE023", "parameter-binding", "multiple body parameters are not supported"),
+                new WasiCompatibilityIssue("SLICE022", "validation", "Property 'Email': DataAnnotations attribute 'CustomValidationAttribute' requires reflection and is not supported in the WASI path."),
+            ],
+        };
+
+        var capability = RouteTargetCapabilities.Classify(routeWithIssues).WasiDispatch;
+
+        Assert.Equal(RouteTargetCapabilities.Ineligible, capability.Status);
+        Assert.Equal(2, capability.Issues.Count);
+        Assert.Equal("SLICE023", capability.Issues[0].Code);
+        Assert.Equal("SLICE022", capability.Issues[1].Code);
+        Assert.Contains("Property 'Email'", capability.Issues[1].Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Route_catalog_prefers_generated_metadata_from_built_project()
     {
         using var fixture = CliProjectFixture.Create(
@@ -284,6 +323,54 @@ public class CliFixtureTests
         Assert.Equal(RouteCatalog.PortabilityPortable, route.Portability);
         Assert.Contains(route.Parameters, static parameter => parameter is { Type: "int", Name: "id" });
         Assert.Contains(route.Parameters, static parameter => parameter is { Type: "string", Name: "tenant", BindingSource: "header", BindingName: "X|Tenant\nName;Segment" });
+    }
+
+    [Fact]
+    public async Task Route_catalog_decodes_wasi_compatibility_issues_from_a_built_project()
+    {
+        using var fixture = CliProjectFixture.Create(
+            "wasi-issues-app",
+            $$"""
+            <Project Sdk="Microsoft.NET.Sdk">
+              <PropertyGroup>
+                <TargetFramework>net10.0</TargetFramework>
+                <RootNamespace>WasiIssuesApp</RootNamespace>
+              </PropertyGroup>
+              <ItemGroup>
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.Core", "SliceFx.Core.csproj")}}" />
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.SourceGenerator", "SliceFx.SourceGenerator.csproj")}}" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.Wasi", "SliceFx.Wasi.csproj")}}" />
+              </ItemGroup>
+            </Project>
+            """);
+
+        fixture.WriteFeature(
+            "Features/Orders/GetOrder.cs",
+            """
+            using System.Threading.Tasks;
+            using Microsoft.AspNetCore.Http;
+            using SliceFx;
+
+            namespace WasiIssuesApp.Features.Orders;
+
+            [Feature("GET /orders/{id}")]
+            public static class GetOrder
+            {
+                public static Task<string> Handle(
+                    string id,
+                    [AsParameters] Filter a,
+                    [AsParameters] Filter b) => Task.FromResult(id);
+
+                public sealed record Filter(string Value);
+            }
+            """);
+
+        await fixture.BuildAsync();
+
+        var route = Assert.Single(RouteCatalog.Discover(ProjectContextDiscovery.Discover(fixture.ProjectFile.FullName)));
+
+        Assert.Equal(2, route.WasiCompatibilityIssues!.Length);
+        Assert.All(route.WasiCompatibilityIssues, issue => Assert.Equal("SLICE023", issue.Code));
     }
 
     [Fact]
