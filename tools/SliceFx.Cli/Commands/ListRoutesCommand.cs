@@ -79,8 +79,14 @@ internal static partial class ListRoutesCommand
         foreach (var route in routes)
         {
             var capabilities = RouteTargetCapabilities.Classify(route);
+            var note = capabilities.WasiDispatch.Reason ?? route.PortabilityReason ?? "-";
+            if (capabilities.WasiDispatch.Issues.Count > 1)
+            {
+                note += $" (+{capabilities.WasiDispatch.Issues.Count - 1} more)";
+            }
+
             Console.WriteLine(
-                $"{Pad(route.Method, 6)}  {Pad(route.Pattern, 28)}  {Pad(route.EndpointName, 26)}  {Pad(route.SourceAssemblyName ?? "-", 24)}  {Pad(route.Portability, 12)}  {Pad(capabilities.WasiDispatch.Status, 10)}  {capabilities.WasiDispatch.Reason ?? route.PortabilityReason ?? "-"}");
+                $"{Pad(route.Method, 6)}  {Pad(route.Pattern, 28)}  {Pad(route.EndpointName, 26)}  {Pad(route.SourceAssemblyName ?? "-", 24)}  {Pad(route.Portability, 12)}  {Pad(capabilities.WasiDispatch.Status, 10)}  {note}");
         }
 
         var portable = routes.Count(static route => route.Portability == RouteCatalog.PortabilityPortable);

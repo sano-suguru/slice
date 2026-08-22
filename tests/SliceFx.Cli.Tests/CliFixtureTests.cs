@@ -2647,6 +2647,128 @@ public class CliFixtureTests
     }
 
     [Fact]
+    public async Task Routes_json_output_includes_wasi_compatibility_issues()
+    {
+        using var fixture = CliProjectFixture.Create(
+            "wasi-issues-app-json",
+            $$"""
+            <Project Sdk="Microsoft.NET.Sdk">
+              <PropertyGroup>
+                <TargetFramework>net10.0</TargetFramework>
+                <RootNamespace>WasiIssuesApp</RootNamespace>
+              </PropertyGroup>
+              <ItemGroup>
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.Core", "SliceFx.Core.csproj")}}" />
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.SourceGenerator", "SliceFx.SourceGenerator.csproj")}}" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.Wasi", "SliceFx.Wasi.csproj")}}" />
+              </ItemGroup>
+            </Project>
+            """);
+        fixture.WriteFeature(
+            "Features/Orders/GetOrder.cs",
+            """
+            using System.Threading.Tasks;
+            using Microsoft.AspNetCore.Http;
+            using SliceFx;
+
+            namespace WasiIssuesApp.Features.Orders;
+
+            [Feature("GET /orders/{id}")]
+            public static class GetOrder
+            {
+                public static Task<string> Handle(
+                    string id,
+                    [AsParameters] Filter a,
+                    [AsParameters] Filter b) => Task.FromResult(id);
+
+                public sealed record Filter(string Value);
+            }
+            """);
+        await fixture.BuildAsync();
+
+        var originalOut = Console.Out;
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        int exitCode;
+        try
+        {
+            exitCode = await ListRoutesCommand.Build()
+                .Parse(["--project", fixture.ProjectFile.FullName, "--format", "json"])
+                .InvokeAsync(cancellationToken: TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+
+        Assert.Equal(0, exitCode);
+        using var document = JsonDocument.Parse(writer.ToString());
+        var route = document.RootElement.EnumerateArray().Single();
+        var issues = route.GetProperty("capabilities").GetProperty("wasiDispatch").GetProperty("issues");
+        Assert.Equal(2, issues.GetArrayLength());
+        Assert.Equal("SLICE023", issues[0].GetProperty("code").GetString());
+    }
+
+    [Fact]
+    public async Task Routes_table_output_summarizes_multiple_issues()
+    {
+        using var fixture = CliProjectFixture.Create(
+            "wasi-issues-app-table",
+            $$"""
+            <Project Sdk="Microsoft.NET.Sdk">
+              <PropertyGroup>
+                <TargetFramework>net10.0</TargetFramework>
+                <RootNamespace>WasiIssuesApp</RootNamespace>
+              </PropertyGroup>
+              <ItemGroup>
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.Core", "SliceFx.Core.csproj")}}" />
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.SourceGenerator", "SliceFx.SourceGenerator.csproj")}}" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+                <ProjectReference Include="{{Path.Combine(FindRepoRoot(), "src", "SliceFx.Wasi", "SliceFx.Wasi.csproj")}}" />
+              </ItemGroup>
+            </Project>
+            """);
+        fixture.WriteFeature(
+            "Features/Orders/GetOrder.cs",
+            """
+            using System.Threading.Tasks;
+            using Microsoft.AspNetCore.Http;
+            using SliceFx;
+
+            namespace WasiIssuesApp.Features.Orders;
+
+            [Feature("GET /orders/{id}")]
+            public static class GetOrder
+            {
+                public static Task<string> Handle(
+                    string id,
+                    [AsParameters] Filter a,
+                    [AsParameters] Filter b) => Task.FromResult(id);
+
+                public sealed record Filter(string Value);
+            }
+            """);
+        await fixture.BuildAsync();
+
+        var originalOut = Console.Out;
+        var writer = new StringWriter();
+        Console.SetOut(writer);
+        int exitCode;
+        try
+        {
+            exitCode = await ListRoutesCommand.Build()
+                .Parse(["--project", fixture.ProjectFile.FullName])
+                .InvokeAsync(cancellationToken: TestContext.Current.CancellationToken);
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+
+        Assert.Equal(0, exitCode);
+        Assert.Contains("(+1 more)", writer.ToString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Project_option_directory_with_no_csproj_throws()
     {
         var emptyDir = Directory.CreateTempSubdirectory("slicefx-test-empty-").FullName;

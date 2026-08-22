@@ -4696,7 +4696,7 @@ public class SourceGeneratorCompileTests
         }
 
         // rawArg is a C# string literal like "SLICE023|parameter-binding|<base64>\nSLICE023|...".
-        var decoded = System.Text.Json.JsonSerializer.Deserialize<string>(
+        var decoded = JsonSerializer.Deserialize<string>(
             "\"" + rawArg[1..^1].Replace("\\\"", "\"") + "\"")!;
         var result = new List<(string Code, string Category, string Message)>();
         foreach (var entry in decoded.Split('\n', StringSplitOptions.RemoveEmptyEntries))
