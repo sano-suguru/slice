@@ -1115,7 +1115,7 @@ public sealed class SliceFeatureGenerator : IIncrementalGenerator
                 }
 
                 requiresReflectionValidation = true;
-                unsupportedAttributes.Add(SerializeUnsupportedValidationAttribute(handle.ContainingType.Name, attribute));
+                unsupportedAttributes.Add(SerializeUnsupportedValidationAttribute(handle.ContainingType.Name, propertyName: null, attribute));
             }
 
             if (ImplementsIValidatableObject(requestType))
@@ -1156,7 +1156,7 @@ public sealed class SliceFeatureGenerator : IIncrementalGenerator
                     if (rule is null)
                     {
                         requiresReflectionValidation = true;
-                        unsupportedAttributes.Add(SerializeUnsupportedValidationAttribute(handle.ContainingType.Name, attribute));
+                        unsupportedAttributes.Add(SerializeUnsupportedValidationAttribute(handle.ContainingType.Name, property.Name, attribute));
                         continue;
                     }
 
@@ -1513,23 +1513,24 @@ public sealed class SliceFeatureGenerator : IIncrementalGenerator
         return null;
     }
 
-    private static string SerializeUnsupportedValidationAttribute(string featureName, AttributeData attribute)
+    private static string SerializeUnsupportedValidationAttribute(string featureName, string? propertyName, AttributeData attribute)
     {
         var location = attribute.ApplicationSyntaxReference is null
             ? DiagnosticLocationModel.None
             : CreateDiagnosticLocation(attribute.ApplicationSyntaxReference.SyntaxTree.GetLocation(attribute.ApplicationSyntaxReference.Span));
         var attributeName = attribute.AttributeClass?.Name ?? "ValidationAttribute";
-        return SerializeUnsupportedValidation(featureName, attributeName, location);
+        return SerializeUnsupportedValidation(featureName, propertyName, attributeName, location);
     }
 
     private static string SerializeUnsupportedValidationType(string featureName, INamedTypeSymbol type, string attributeName)
     {
         var location = CreateDiagnosticLocation(type.Locations.Length > 0 ? type.Locations[0] : null);
-        return SerializeUnsupportedValidation(featureName, attributeName, location);
+        return SerializeUnsupportedValidation(featureName, propertyName: null, attributeName, location);
     }
 
     private static string SerializeUnsupportedValidation(
         string featureName,
+        string? propertyName,
         string attributeName,
         DiagnosticLocationModel location)
         => string.Join("|", [
@@ -1542,6 +1543,7 @@ public sealed class SliceFeatureGenerator : IIncrementalGenerator
             location.EndCharacter.ToString(System.Globalization.CultureInfo.InvariantCulture),
             Encode(featureName),
             Encode(attributeName),
+            Encode(propertyName ?? ""),
         ]);
 
     private static string Encode(string value)

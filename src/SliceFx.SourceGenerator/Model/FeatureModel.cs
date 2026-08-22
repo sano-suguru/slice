@@ -195,7 +195,7 @@ internal sealed record FeatureModel(
         foreach (var line in SerializedUnsupportedValidationAttributes.Split('\n'))
         {
             var parts = line.Split('|');
-            if (parts.Length != 9
+            if (parts.Length != 10
                 || !int.TryParse(parts[1], out var sourceStart)
                 || !int.TryParse(parts[2], out var sourceLength)
                 || !int.TryParse(parts[3], out var startLine)
@@ -206,6 +206,7 @@ internal sealed record FeatureModel(
                 continue;
             }
 
+            var propertyName = Decode(parts[9]);
             builder.Add(new UnsupportedValidationAttributeModel(
                 Decode(parts[0]),
                 sourceStart,
@@ -215,7 +216,8 @@ internal sealed record FeatureModel(
                 endLine,
                 endCharacter,
                 Decode(parts[7]),
-                Decode(parts[8])));
+                Decode(parts[8]),
+                string.IsNullOrEmpty(propertyName) ? null : propertyName));
         }
 
         return builder.ToImmutable();
@@ -272,7 +274,8 @@ internal readonly record struct UnsupportedValidationAttributeModel(
     int EndLine,
     int EndCharacter,
     string FeatureName,
-    string AttributeName)
+    string AttributeName,
+    string? PropertyName)
 {
     public DiagnosticLocationModel GetDiagnosticLocationModel()
         => new(
