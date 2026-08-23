@@ -15,7 +15,7 @@
 
 Website: <https://sano-suguru.github.io/slicefx/>
 
-**SliceFx** は、ASP.NET Core Minimal APIs は好きだが、route string・DTO・validation・filter・client・deployment check をバラバラに管理したくないチーム向けの実験的 .NET framework です。1つの feature は、request、response、handler、validation、filter を1つの static class にまとめます。source generator は標準 Minimal API 登録に加え、tooling、AOT-friendly startup、Lambda 実験、WASI/WebAssembly dispatch 用の route manifest を生成します。
+**SliceFx** は実験的な .NET framework です。ASP.NET Core Minimal APIs は好きだが、route string・DTO・validation・filter・client・deployment check がバラバラに管理されるのは避けたい、というチーム向けに作られています。1つの feature は、request、response、handler、validation、filter を1つの static class にまとめます。source generator は標準 Minimal API 登録を生成するほか、tooling・AOT-friendly startup・Lambda 実験・WASI/WebAssembly dispatch で使う route manifest も生成します。
 
 設計背景は [Design decisions FAQ](docs/ja/design-decisions.md) と [Production readiness criteria](docs/ja/production-readiness.md) を参照してください。
 
@@ -32,7 +32,7 @@ Website: <https://sano-suguru.github.io/slicefx/>
 
 SliceFx は ASP.NET Core の機能を制限しません。authorization、rate limiting、caching、CORS、custom validation pattern については [保持できるもの](#保持できるもの) を参照してください。
 
-SliceFx は ASP.NET Core の置き換えではありません。Minimal APIs の周囲に、明示的な feature file、生成 contract、portability check を足す vertical-slice layer です。mediator stack や独自 endpoint pipeline を採用せず、Minimal API に近い形を保ちます。
+SliceFx は ASP.NET Core の置き換えではなく、Minimal API の周囲に vertical-slice layer を足す仕組みです。具体的には、明示的な feature file、生成 contract、portability check を追加します。mediator stack や独自 endpoint pipeline は採用せず、Minimal API に近い形を保ちます。
 
 既存の ASP.NET Core アプリを全面移行する必要はありません。1 endpoint から始め、残りは controller や手書き Minimal API のままにできます。移行時は [Minimal API からの移行](docs/ja/migrations/from-minimal-api.md) を参照してください。
 
@@ -40,7 +40,7 @@ SliceFx は ASP.NET Core の置き換えではありません。Minimal APIs の
 
 ![Latest source generator benchmark results](https://raw.githubusercontent.com/sano-suguru/slicefx/main/docs/perf/latest.svg)
 
-各 endpoint は static feature file です。source generator はそれらを ASP.NET registration、tooling 用 route metadata、Lambda handler、または handler shape が portable な場合の wasi:http dispatch に変換します。
+各 endpoint は static feature file です。source generator はそれらを ASP.NET registration、tooling 用の route metadata、Lambda handler に変換します。handler shape が portable な場合は、wasi:http dispatch にも変換します。
 
 ```bash
 dotnet run --project samples/SliceFx.Sample
@@ -117,7 +117,7 @@ public static class CreateUser
 
 generator は `[Feature]` class を発見し、`AddSlice()` / `MapSlices()` を生成し、Minimal API binding と validation を接続します。portable endpoint では plain response record を優先してください。`Results.NotFound()` や `Results.NoContent()` のような ASP.NET-specific response helper が必要な場合は `IResult` を使います。
 
-> **DI binding note:** ASP.NET path の binding は通常の Minimal API そのものです。登録済み service は DI から解決されます。concrete service parameter に `[FromServices]` を付ける必要があるのは、handler を ASP.NET、WASI、Lambda の portable dispatch に対応させたい場合です。詳しくは [`docs/ja/guides/parameter-binding.md`](docs/ja/guides/parameter-binding.md) を参照してください。
+> **DI binding note:** ASP.NET path の binding は通常の Minimal API そのものです。登録済み service は DI から解決されます。handler を ASP.NET、WASI、Lambda の portable dispatch に対応させたい場合だけ、concrete service parameter に `[FromServices]` を付けてください。詳しくは [`docs/ja/guides/parameter-binding.md`](docs/ja/guides/parameter-binding.md) を参照してください。
 
 ## Filters and validation
 

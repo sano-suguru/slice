@@ -13,7 +13,24 @@
 
 Website: <https://sano-suguru.github.io/slicefx/>
 
-**SliceFx** is an experimental .NET framework for teams that like ASP.NET Core Minimal APIs but do not want route strings, DTOs, validation, filters, clients, and deployment checks to drift apart. A feature is one static class with its request, response, handler, validation, and filters in one place. The generator emits standard Minimal API registrations plus a route manifest for tooling, AOT-friendly startup, Lambda experiments, and WASI/WebAssembly dispatch.
+**SliceFx** is an experimental .NET framework built on ASP.NET Core Minimal APIs. A feature is one file: request, response, handler, validation, and filters together. A source generator turns it into standard Minimal API registrations, a route manifest, and typed clients, so nothing needs hand-syncing.
+
+```csharp
+[Feature("POST /users", Summary = "Create a new user")]
+public static class CreateUser
+{
+    public record Request([Required, MinLength(2)] string Name, [Required, EmailAddress] string Email);
+    public record Response(Guid Id, string Name, string Email, DateTime CreatedAt);
+
+    public static async Task<Response> Handle(Request req, IUserStore store, CancellationToken ct)
+    {
+        var user = await store.AddAsync(req.Name, req.Email, ct);
+        return new Response(user.Id, user.Name, user.Email, user.CreatedAt);
+    }
+}
+```
+
+This is the whole feature: route, validation, and handler. The generated `AddSlice()` / `MapSlices()` calls wire it up.
 
 Curious about the design choices? See **[Design decisions FAQ](docs/design-decisions.md)** and **[Production readiness criteria](docs/production-readiness.md)**.
 
@@ -28,19 +45,11 @@ Curious about the design choices? See **[Design decisions FAQ](docs/design-decis
 | Early portability feedback | `slicefx routes` classifies each endpoint as `portable`, `partial`, or `aspnet-only`; Lambda and wasi:http adapters are optional. |
 | Low lock-in | Generated code compiles down to standard `MapMethods` calls. Remove the source generator reference and expand the output in place for a low-residue exit path. |
 
-SliceFx doesn't restrict any ASP.NET feature. For authorization, rate limiting, caching, CORS, and custom validation patterns see [What you keep](#what-you-keep).
-
-SliceFx is not a replacement for ASP.NET Core. It is a generated vertical-slice layer around Minimal APIs for teams that want explicit feature files, generated contracts, and portability checks without adopting a mediator stack or custom endpoint pipeline.
-
-SliceFx compiles down to standard `WebApplication.MapMethods` calls — removing the source generator reference and expanding the generated output in place is the full exit path. For teams already on FastEndpoints or similar, SliceFx fills a different niche: compile-time portability classification across ASP.NET, Lambda, and wasi:http, not a richer filter and pipeline ecosystem.
-
-Existing ASP.NET Core apps do not need a rewrite. Start with one endpoint, keep the rest of the app on controllers or handwritten Minimal APIs, and use the migration audit plus contract checks to evaluate the shape. See [migrating from Minimal APIs](docs/migrations/from-minimal-api.md) and [migrating from controllers](docs/migrations/from-controllers.md).
+**What SliceFx is not:** a replacement for ASP.NET Core, or a mediator/pipeline framework like MediatR. Auth, rate limiting, CORS, and `IEndpointFilter` all still work as-is (see [What you keep](#what-you-keep)). SliceFx is a generated layer around Minimal APIs that compiles down to plain `WebApplication.MapMethods` calls, so dropping the source generator reference leaves the generated code working as your exit path. You don't need to rewrite anything: add it to one endpoint in an existing app and keep the rest on controllers or handwritten Minimal APIs ([migrating from Minimal APIs](docs/migrations/from-minimal-api.md), [migrating from controllers](docs/migrations/from-controllers.md)).
 
 ### Latest benchmark results
 
 ![Latest source generator benchmark results](https://raw.githubusercontent.com/sano-suguru/slicefx/main/docs/perf/latest.svg)
-
-Each endpoint is a static feature file: request, response, validation, filters, and handler stay together. The source generator turns those features into ASP.NET registrations, route metadata for tooling, Lambda handlers, or wasi:http dispatch where the handler shape is portable.
 
 ```bash
 dotnet run --project samples/SliceFx.Sample
