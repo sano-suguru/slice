@@ -58,7 +58,7 @@ curl http://localhost:5099/health
 
 ## Project status
 
-SliceFx is pre-1.0 experimental software. Preview packages use `0.x` versions until the API is intentionally stabilized.
+SliceFx is pre-1.0 experimental software. Preview packages use `0.x` versions until the API is intentionally stabilized. A subset of `SliceFx.Core` — `[Feature]`, `[Filter<T>]`, `ISliceValidator<T>`, `SliceValidationResult`, `SliceResult<T>`/`SliceResult` — already carries an explicit stability commitment; see [`docs/api-stability-policy.md`](docs/api-stability-policy.md) for scope and terms.
 
 The latest preview is published on NuGet — see the NuGet badge above. Install from NuGet:
 

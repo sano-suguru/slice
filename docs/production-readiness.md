@@ -126,7 +126,7 @@ Maintainer dogfooding is live: [slicefx-inbox](https://github.com/sano-suguru/sl
 
 ## Adoption matrix
 
-These recommendations apply to experiments, pilots, and preview evaluation. Production use requires a published package, completed release smoke tests, project-specific acceptance criteria, external production references, and an explicit API-stability commitment.
+These recommendations apply to experiments, pilots, and preview evaluation. Production use requires a published package, completed release smoke tests, project-specific acceptance criteria, external production references, and an explicit API-stability commitment. The [API stability policy](api-stability-policy.md) is that commitment: it scopes stability to `[Feature]`, `[Filter<T>]`, `ISliceValidator<T>`, `SliceValidationResult`, and `SliceResult<T>`/`SliceResult` in `SliceFx.Core`, and lists what stays explicitly out of scope.
 
 | Project shape | Recommendation |
 |---|---|
