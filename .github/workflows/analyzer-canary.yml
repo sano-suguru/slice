@@ -38,6 +38,17 @@ jobs:
           echo "status=$status" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Format check with latest .NET 10 SDK
+        id: format-canary
+        shell: bash
+        run: |
+          set +e
+          dotnet format SliceFx.slnx --verify-no-changes --severity info --exclude-diagnostics CS1591 xUnit1004 2>&1 | tee format-canary.log
+          status=${PIPESTATUS[0]}
+          set -e
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
       - name: Summarize canary result
         shell: bash
         run: |
@@ -60,8 +71,26 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
+          if [ "${{ steps.format-canary.outputs.status }}" = "0" ]; then
+            {
+              echo "## Format canary passed"
+              echo
+              echo "\`dotnet format --verify-no-changes\` is clean with the latest .NET 10 SDK, the same command the pre-push hook and required CI run against the \`global.json\`-pinned SDK."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "## Format canary reported diagnostics"
+              echo
+              echo "The pinned SDK in \`global.json\` may still be clean; this only means a newer .NET 10 SDK patch/feature band disagrees. Contributors whose local SDK has rolled forward past the pin may see the same false-positive pre-push hook failures."
+              echo
+              echo '```text'
+              tail -n 200 format-canary.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Report analyzer drift
-        if: steps.canary.outputs.status != '0'
+        if: steps.canary.outputs.status != '0' || steps.format-canary.outputs.status != '0'
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -70,19 +99,35 @@ jobs:
           title="Analyzer canary reported diagnostics"
           issue_number="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
           {
-            echo "The analyzer canary reported diagnostics with the latest .NET 10 SDK and \`AnalysisLevel=latest-recommended\`."
-            echo
-            echo "Required PR/main CI remains on the pinned analyzer baseline. Review this as a maintenance signal; do not bump the baseline automatically."
-            echo
+            if [ "${{ steps.canary.outputs.status }}" != "0" ]; then
+              echo "The analyzer canary reported diagnostics with the latest .NET 10 SDK and \`AnalysisLevel=latest-recommended\`."
+              echo
+              echo "Required PR/main CI remains on the pinned analyzer baseline. Review this as a maintenance signal; do not bump the baseline automatically."
+              echo
+              echo "<details><summary>Build canary: last 200 lines</summary>"
+              echo
+              echo '```text'
+              tail -n 200 analyzer-canary.log
+              echo '```'
+              echo
+              echo "</details>"
+              echo
+            fi
+            if [ "${{ steps.format-canary.outputs.status }}" != "0" ]; then
+              echo "The format canary (\`dotnet format --verify-no-changes\`) reported diagnostics with the latest .NET 10 SDK, even though the pinned SDK is expected to be clean."
+              echo
+              echo "This means a developer whose local SDK has rolled forward past the \`global.json\` pin may hit false-positive pre-push hook failures unrelated to their change."
+              echo
+              echo "<details><summary>Format canary: last 200 lines</summary>"
+              echo
+              echo '```text'
+              tail -n 200 format-canary.log
+              echo '```'
+              echo
+              echo "</details>"
+              echo
+            fi
             echo "Workflow run: $RUN_URL"
-            echo
-            echo "<details><summary>Last 200 lines</summary>"
-            echo
-            echo '```text'
-            tail -n 200 analyzer-canary.log
-            echo '```'
-            echo
-            echo "</details>"
           } > analyzer-canary-issue.md
 
           if [ -n "$issue_number" ]; then
