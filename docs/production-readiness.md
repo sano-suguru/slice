@@ -122,10 +122,7 @@ Measured on Apple M1, macOS 26.4.1, .NET SDK 10.0.300, BenchmarkDotNet 0.14.0, S
 
 ## Adoption evidence
 
-| Evidence type | Current public count | Notes |
-|---|---:|---|
-| Maintainer dogfooding (live) | 1 | [slicefx-inbox](https://github.com/sano-suguru/slicefx-inbox) running on Fermyon Cloud (Spin WASI, `wasi:http/incoming-handler`) since preview.5. All 11 handlers return `SliceResult<T>` / `SliceResult` (preview.7+); `SliceApiClient.g.cs` fully generated. |
-| Published personal dogfooding logs | 0 | A published write-up is planned; the dogfooding itself is live. |
+Maintainer dogfooding is live: [slicefx-inbox](https://github.com/sano-suguru/slicefx-inbox) has been running on Fermyon Cloud (Spin WASI, `wasi:http/incoming-handler`) since preview.5. All 11 handlers return `SliceResult<T>` / `SliceResult` (preview.7+), with `SliceApiClient.g.cs` fully generated.
 
 ## Adoption matrix
 

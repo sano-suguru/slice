@@ -122,10 +122,7 @@ dotnet run -c Release --project tests/SliceFx.Benchmarks.Runtime --no-build -- -
 
 ## Adoption evidence
 
-| Evidence type | Current public count | Notes |
-| --- | ---: | --- |
-| Maintainer dogfooding (live) | 1 | [slicefx-inbox](https://github.com/sano-suguru/slicefx-inbox) が Fermyon Cloud (Spin WASI, `wasi:http/incoming-handler`) で稼働中（preview.5 以降）。全 11 ハンドラが `SliceResult<T>` / `SliceResult`（preview.7+）を返す; `SliceApiClient.g.cs` は完全生成済み。 |
-| Published personal dogfooding logs | 0 | write-up は計画中。dogfooding 自体は稼働中。 |
+Maintainer dogfooding は稼働中です: [slicefx-inbox](https://github.com/sano-suguru/slicefx-inbox) が Fermyon Cloud (Spin WASI, `wasi:http/incoming-handler`) で preview.5 以降稼働しています。全 11 ハンドラが `SliceResult<T>` / `SliceResult`（preview.7+）を返し、`SliceApiClient.g.cs` は完全生成済みです。
 
 ## Adoption matrix
 
