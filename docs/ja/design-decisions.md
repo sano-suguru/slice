@@ -16,6 +16,18 @@ SliceFx は ASP.NET Core の上に mediator stack を追加しません。
 
 filter 的な behavior が必要なら `[Filter<T>]` を付けます。validation には supported DataAnnotations attribute または `ISliceValidator<T>` を使います。
 
+## SliceFx と FastEndpoints はどう違うのか
+
+どちらも fat controller から抜け出し、1 route に 1 unit というスタイルを取ります。どちらも ASP.NET Core を置き換えず、その上に構築されます。違いは、その "unit" が何であるか、ASP.NET Core にどれだけ近い形を保つかにあります。
+
+- **endpoint の形。** FastEndpoints の endpoint は class です。`Endpoint<TRequest, TResponse>`(またはその類似型)を継承し、`Configure()` と `HandleAsync()` を override します。SliceFx の feature は `public static class` で、`public static Handle` method を1つ持つだけです。継承する base class はなく、request ごとに instance を construct することもありません(上の「なぜ Feature class と `Handle` method は static なのか」を参照)。
+- **cross-cutting behavior。** FastEndpoints は独自の Pre-/Post-Processor pipeline を持ち、endpoint ごと、または global に attach します。SliceFx は `[Filter<T>]` を通じて ASP.NET Core の `IEndpointFilter` をそのまま再利用し、2つ目の pipeline 概念を導入しません(上の「なぜ `IMediator` / `IPipelineBehavior` layer を持たないのか」と同じ理由です)。
+- **生成される surface。** SliceFx の source generator は素の `endpoints.MapMethods(pattern, [method], delegate)` を emit します。生成コードは Minimal API そのものであり、source generator 参照を外しても `MapMethods` 呼び出しはそのまま動き続けます。FastEndpoints は内部で Minimal API を使いますが、実際に書くもの・tooling が扱うものは独自の `Endpoint<T>` 抽象です。
+- **host 間の portability。** SliceFx は各 feature の compile-time portability を `portable` / `partial` / `aspnet-only` に分類します。対象となる feature には、ASP.NET 以外の dispatch path として WASI(`SliceFx.Wasi`)と function-per-feature NativeAOT Lambda(`SliceFx.Lambda.FunctionPerFeature`)を提供します。どちらも experimental で ASP.NET のフル機能より狭い範囲ですが、host が変わっても handler の形は変わりません。一方 FastEndpoints は ASP.NET Core の hosting model を対象とします(2026年初頭時点で Native AOT publish にも対応済み)。ASP.NET の外での host-independent な dispatch はスコープに含みません。
+- **validation。** FastEndpoints は FluentValidation と統合します。SliceFx は request record の attribute から DataAnnotations validation を生成し、code が必要な rule(cross-field check、async lookup 等)には `ISliceValidator<T>` を重ねます(下の「なぜ DataAnnotations と `ISliceValidator<T>` の両方があるのか」を参照)。
+
+専用 pipeline・標準搭載の FluentValidation・endpoint-level の広い設定範囲など、ASP.NET Core の中でより豊富で opinionated な endpoint framework がほしいなら FastEndpoints が向いています。生成コードを手書きの Minimal API と見分けがつかない状態に保ちたい場合は SliceFx が向いています。ASP.NET の外(WASI、Lambda function-per-feature)で同じ feature を動かすことが後付けではなく目標そのものである場合も同様です。
+
 ## なぜ `WebApplication.CreateSlimBuilder` なのか
 
 `CreateSlimBuilder` は trimming-friendly な host です。API-only app に不要な Razor / MVC service を既定で入れないため、trimmed / AOT-published binary を小さくできます。SliceFx は Lambda / WASI のように binary size が重要な環境への portability も価値に含めるため、sample ではこの builder を使います。省略された service が必要な project では `CreateBuilder` に切り替えて構いません。
